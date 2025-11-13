@@ -14,7 +14,7 @@ export default async function HistoryPage() {
     redirect('/login')
   }
 
-  const activities = await getStockActivities()
+  const { activities, isFreePlan, historyLimitDays } = await getStockActivities()
 
   return (
     <div className="min-h-screen bg-background">
@@ -26,7 +26,11 @@ export default async function HistoryPage() {
             Historique des mouvements de stock
           </p>
         </div>
-        <HistoryTable activities={activities} />
+        <HistoryTable
+          activities={activities}
+          isFreePlan={isFreePlan}
+          historyLimitDays={historyLimitDays}
+        />
       </main>
     </div>
   )

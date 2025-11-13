@@ -100,10 +100,20 @@ export function ProductsClient({ initialProducts }: ProductsClientProps) {
         {isAtLimit && (
           <Alert className="mb-6">
             <Sparkles className="h-4 w-4" />
-            <AlertTitle>Limite du plan gratuit atteinte</AlertTitle>
-            <AlertDescription>
-              Vous avez atteint la limite de {FREE_PLAN_LIMIT} produits. Passez
-              à Premium pour ajouter des produits illimités.
+            <AlertTitle>Plan gratuit - Limite de {FREE_PLAN_LIMIT} produits atteinte</AlertTitle>
+            <AlertDescription className="flex items-center justify-between gap-4">
+              <span>
+                Vous avez atteint la limite de {FREE_PLAN_LIMIT} produits.
+                Passez à Premium pour gérer un nombre illimité de produits.
+              </span>
+              <Button
+                size="sm"
+                onClick={() => setUpgradeModalOpen(true)}
+                className="flex-shrink-0"
+              >
+                <Sparkles className="h-4 w-4 mr-2" />
+                Passer à Premium
+              </Button>
             </AlertDescription>
           </Alert>
         )}

@@ -41,25 +41,25 @@ export function UpgradeModal({ open, onOpenChange }: UpgradeModalProps) {
             <ul className="space-y-3 mb-6">
               <li className="flex items-start gap-2">
                 <span className="text-sm">
-                  Produits illimités (actuellement limité à 10)
+                  ✓ Produits illimités (actuellement limité à 10)
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-sm">
-                  Historique complet des activités
+                  ✓ Historique complet sans limite (actuellement 30 jours)
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-sm">
-                  Alertes par email personnalisées
+                  ✓ Alertes par email personnalisées
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-sm">Export des données en CSV</span>
+                <span className="text-sm">✓ Export des données en CSV</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-sm">
-                  Analyses et statistiques avancées
+                  ✓ Analyses et statistiques avancées
                 </span>
               </li>
             </ul>
