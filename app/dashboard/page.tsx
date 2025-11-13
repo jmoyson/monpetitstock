@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import Link from 'next/link'
+import { Package } from 'lucide-react'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -57,17 +59,22 @@ export default async function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Stock</CardTitle>
-              <CardDescription>Gérez votre inventaire</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                Fonctionnalité à venir...
-              </p>
-            </CardContent>
-          </Card>
+          <Link href="/products">
+            <Card className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Package className="h-5 w-5" />
+                  Produits
+                </CardTitle>
+                <CardDescription>Gérez vos produits et leur inventaire</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                  Cliquez pour accéder à la gestion des produits
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
 
           <Card>
             <CardHeader>
