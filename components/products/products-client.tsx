@@ -7,13 +7,12 @@ import {
   Pencil,
   Trash2,
   Package,
-  ArrowLeft,
   Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { StockStatusBadge } from "@/components/shared/stock-status-badge";
+import { CategoryBadges } from "@/components/shared/category-badges";
 import {
   Table,
   TableBody,
@@ -81,47 +80,11 @@ export function ProductsClient({ initialProducts }: ProductsClientProps) {
     }
   };
 
-  const getStockStatus = (stock: number, threshold: number) => {
-    if (stock === 0)
-      return {
-        label: "Rupture",
-        variant: "destructive" as const,
-        className:
-          "bg-red-50 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-400 dark:border-red-800",
-      };
-    if (stock <= threshold)
-      return {
-        label: "Stock bas",
-        variant: "outline" as const,
-        className:
-          "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-400 dark:border-orange-800",
-      };
-    return {
-      label: "En stock",
-      variant: "secondary" as const,
-      className:
-        "bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-400 dark:border-green-800",
-    };
-  };
-
   return (
-    <div className="min-h-screen bg-background">
-      {/* Navbar */}
-      <nav className="border-b">
+    <div className="bg-background">
+      <div className="border-b">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <Link href="/dashboard">
-                <Button variant="ghost" size="sm">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Retour
-                </Button>
-              </Link>
-              <div className="flex items-center gap-2">
-                <Package className="h-6 w-6" />
-                <h1 className="text-xl font-semibold">Mes Produits</h1>
-              </div>
-            </div>
+          <div className="flex items-center justify-end gap-4">
             <Button onClick={handleCreate}>
               <Plus className="h-4 w-4 mr-2" />
               <span className="hidden sm:inline">Ajouter un produit</span>
@@ -129,7 +92,7 @@ export function ProductsClient({ initialProducts }: ProductsClientProps) {
             </Button>
           </div>
         </div>
-      </nav>
+      </div>
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
@@ -175,84 +138,56 @@ export function ProductsClient({ initialProducts }: ProductsClientProps) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {initialProducts.map((product) => {
-                  const status = getStockStatus(
-                    product.current_stock,
-                    product.alert_threshold
-                  );
-                  const categories = product.category
-                    ? product.category.split(",").filter(Boolean)
-                    : [];
-
-                  return (
-                    <TableRow key={product.id}>
-                      <TableCell className="font-medium">
-                        {product.name}
-                      </TableCell>
-                      <TableCell>
-                        {categories.length > 0 ? (
-                          <div className="flex flex-wrap gap-1">
-                            {categories.map((cat) => (
-                              <Badge
-                                key={cat}
-                                variant="secondary"
-                                className="text-xs"
-                              >
-                                {cat}
-                              </Badge>
-                            ))}
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground text-sm">
-                            -
-                          </span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {product.current_stock}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {product.alert_threshold}
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={status.variant}
-                          className={status.className}
-                        >
-                          {status.label}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              disabled={deletingId === product.id}
-                            >
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onClick={() => handleEdit(product)}
-                            >
-                              <Pencil className="h-4 w-4 mr-2" />
-                              Modifier
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => handleDelete(product.id)}
-                              className="text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Supprimer
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
+                {initialProducts.map((product) => (
+                  <TableRow key={product.id}>
+                    <TableCell className="font-medium">
+                      {product.name}
+                    </TableCell>
+                    <TableCell>
+                      <CategoryBadges category={product.category} maxVisible={3} />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {product.current_stock}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {product.alert_threshold}
+                    </TableCell>
+                    <TableCell>
+                      <StockStatusBadge
+                        currentStock={product.current_stock}
+                        alertThreshold={product.alert_threshold}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            disabled={deletingId === product.id}
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => handleEdit(product)}
+                          >
+                            <Pencil className="h-4 w-4 mr-2" />
+                            Modifier
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleDelete(product.id)}
+                            className="text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Supprimer
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </div>

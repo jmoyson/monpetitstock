@@ -130,3 +130,115 @@ export async function deleteProduct(id: string) {
   revalidatePath('/products')
   return { success: true }
 }
+
+export async function useProduct(productId: string) {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return { error: 'Not authenticated' }
+  }
+
+  // Get current stock
+  const { data: product, error: fetchError } = await supabase
+    .from('products')
+    .select('current_stock')
+    .eq('id', productId)
+    .eq('user_id', user.id)
+    .single()
+
+  if (fetchError || !product) {
+    console.error('Error fetching product:', fetchError)
+    return { error: 'Product not found' }
+  }
+
+  if (product.current_stock <= 0) {
+    return { error: 'Stock already at 0' }
+  }
+
+  // Update stock
+  const { error: updateError } = await supabase
+    .from('products')
+    .update({ current_stock: product.current_stock - 1 })
+    .eq('id', productId)
+    .eq('user_id', user.id)
+
+  if (updateError) {
+    console.error('Error updating stock:', updateError)
+    return { error: 'Failed to update stock' }
+  }
+
+  // Create stock activity
+  const { error: activityError } = await supabase
+    .from('stock_activities')
+    .insert({
+      user_id: user.id,
+      product_id: productId,
+      activity_type: 'out',
+      quantity: -1
+    })
+
+  if (activityError) {
+    console.error('Error creating activity:', activityError)
+  }
+
+  revalidatePath('/products')
+  revalidatePath('/dashboard')
+  return { success: true }
+}
+
+export async function restockProduct(productId: string, quantity: number, note?: string) {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return { error: 'Not authenticated' }
+  }
+
+  if (quantity <= 0) {
+    return { error: 'Quantity must be positive' }
+  }
+
+  // Get current stock
+  const { data: product, error: fetchError } = await supabase
+    .from('products')
+    .select('current_stock')
+    .eq('id', productId)
+    .eq('user_id', user.id)
+    .single()
+
+  if (fetchError || !product) {
+    console.error('Error fetching product:', fetchError)
+    return { error: 'Product not found' }
+  }
+
+  // Update stock
+  const { error: updateError } = await supabase
+    .from('products')
+    .update({ current_stock: product.current_stock + quantity })
+    .eq('id', productId)
+    .eq('user_id', user.id)
+
+  if (updateError) {
+    console.error('Error updating stock:', updateError)
+    return { error: 'Failed to update stock' }
+  }
+
+  // Create stock activity (note: we'll need to add a note column later if needed)
+  const { error: activityError } = await supabase
+    .from('stock_activities')
+    .insert({
+      user_id: user.id,
+      product_id: productId,
+      activity_type: 'in',
+      quantity: quantity
+    })
+
+  if (activityError) {
+    console.error('Error creating activity:', activityError)
+  }
+
+  revalidatePath('/products')
+  revalidatePath('/dashboard')
+  return { success: true }
+}
