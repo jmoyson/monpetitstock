@@ -67,7 +67,7 @@ export async function createProduct(formData: FormData) {
     return { error: 'Failed to create product' }
   }
 
-  revalidatePath('/products')
+  revalidatePath('/stock')
   return { success: true }
 }
 
@@ -104,7 +104,7 @@ export async function updateProduct(id: string, formData: FormData) {
     return { error: 'Failed to update product' }
   }
 
-  revalidatePath('/products')
+  revalidatePath('/stock')
   return { success: true }
 }
 
@@ -127,7 +127,7 @@ export async function deleteProduct(id: string) {
     return { error: 'Failed to delete product' }
   }
 
-  revalidatePath('/products')
+  revalidatePath('/stock')
   return { success: true }
 }
 
@@ -182,8 +182,7 @@ export async function useProduct(productId: string) {
     console.error('Error creating activity:', activityError)
   }
 
-  revalidatePath('/products')
-  revalidatePath('/dashboard')
+  revalidatePath('/stock')
   return { success: true }
 }
 
@@ -224,21 +223,21 @@ export async function restockProduct(productId: string, quantity: number, note?:
     return { error: 'Failed to update stock' }
   }
 
-  // Create stock activity (note: we'll need to add a note column later if needed)
+  // Create stock activity
   const { error: activityError } = await supabase
     .from('stock_activities')
     .insert({
       user_id: user.id,
       product_id: productId,
       activity_type: 'in',
-      quantity: quantity
+      quantity: quantity,
+      note: note || null
     })
 
   if (activityError) {
     console.error('Error creating activity:', activityError)
   }
 
-  revalidatePath('/products')
-  revalidatePath('/dashboard')
+  revalidatePath('/stock')
   return { success: true }
 }

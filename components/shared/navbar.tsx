@@ -1,27 +1,29 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Package } from "lucide-react"
-import { cn } from "@/lib/utils"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Package } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function Navbar() {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   const navLinks = [
-    { href: "/dashboard", label: "Accueil" },
-    { href: "/products", label: "Produits" },
+    { href: "/stock", label: "Stock" },
     { href: "/history", label: "Historique" },
-  ]
+  ];
 
   return (
     <nav className="border-b bg-background">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <Link
+            href="/stock"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          >
             <Package className="h-6 w-6" />
-            <span className="text-xl font-semibold">Mon Stock</span>
-          </div>
+            <span className="text-xl font-semibold">Mon Petit Stock</span>
+          </Link>
           <div className="flex items-center gap-6">
             {navLinks.map((link) => (
               <Link
@@ -41,5 +43,5 @@ export function Navbar() {
         </div>
       </div>
     </nav>
-  )
+  );
 }

@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Search, ChevronsUpDown, X } from "lucide-react"
-import { Input } from "@/components/ui/input"
+import { useState } from "react";
+import { Search, ChevronsUpDown, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import {
   Command,
   CommandEmpty,
@@ -17,28 +17,27 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command"
+} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 
 type HistoryFiltersProps = {
-  searchQuery: string
-  onSearchChange: (value: string) => void
-  dateFilter: string
-  onDateFilterChange: (value: string) => void
-  typeFilter: string
-  onTypeFilterChange: (value: string) => void
-  productFilters: string[]
-  onProductFiltersChange: (value: string[]) => void
-  uniqueProducts: string[]
-}
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
+  dateFilter: string;
+  onDateFilterChange: (value: string) => void;
+  typeFilter: string;
+  onTypeFilterChange: (value: string) => void;
+  productFilters: string[];
+  onProductFiltersChange: (value: string[]) => void;
+  uniqueProducts: string[];
+};
 
 export function HistoryFilters({
   searchQuery,
@@ -51,19 +50,19 @@ export function HistoryFilters({
   onProductFiltersChange,
   uniqueProducts,
 }: HistoryFiltersProps) {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   const toggleProduct = (product: string) => {
     if (productFilters.includes(product)) {
-      onProductFiltersChange(productFilters.filter((p) => p !== product))
+      onProductFiltersChange(productFilters.filter((p) => p !== product));
     } else {
-      onProductFiltersChange([...productFilters, product])
+      onProductFiltersChange([...productFilters, product]);
     }
-  }
+  };
 
   const clearProductFilters = () => {
-    onProductFiltersChange([])
-  }
+    onProductFiltersChange([]);
+  };
 
   return (
     <div className="mb-6">
@@ -83,7 +82,7 @@ export function HistoryFilters({
           </div>
 
           {/* Filters group - stays together */}
-          <div className="flex flex-row gap-2 md:flex-shrink-0">
+          <div className="flex flex-row gap-2 md:shrink-0">
             {/* Date Filter */}
             <Select value={dateFilter} onValueChange={onDateFilterChange}>
               <SelectTrigger className="w-[140px]">
@@ -91,7 +90,7 @@ export function HistoryFilters({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Toutes périodes</SelectItem>
-                <SelectItem value="today">Aujourd'hui</SelectItem>
+                <SelectItem value="today">Aujourd&apos;hui</SelectItem>
                 <SelectItem value="week">7 derniers jours</SelectItem>
                 <SelectItem value="month">30 derniers jours</SelectItem>
               </SelectContent>
@@ -124,7 +123,10 @@ export function HistoryFilters({
                     ) : (
                       <span className="flex items-center gap-1">
                         Produits
-                        <Badge variant="secondary" className="ml-1 px-1.5 py-0 text-xs">
+                        <Badge
+                          variant="secondary"
+                          className="ml-1 px-1.5 py-0 text-xs"
+                        >
                           {productFilters.length}
                         </Badge>
                       </span>
@@ -174,5 +176,5 @@ export function HistoryFilters({
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -53,7 +53,7 @@ export function MagicLinkForm() {
         });
         setEmail("");
       }
-    } catch (error) {
+    } catch {
       setMessage({
         type: "error",
         text: "Une erreur est survenue. Veuillez réessayer.",

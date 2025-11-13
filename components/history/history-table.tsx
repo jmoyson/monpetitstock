@@ -2,14 +2,12 @@
 
 import { useState, useMemo } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { History, Sparkles } from "lucide-react"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Button } from "@/components/ui/button"
-import type { StockActivity } from "@/app/history/actions"
+import { History } from "lucide-react"
+import type { StockActivity } from "@/app/(dashboard)/history/actions"
 import { ActivityTypeBadge } from "@/components/shared/activity-type-badge"
 import { formatDate, formatQuantity } from "@/lib/utils/formatters"
 import { HistoryFilters } from "./history-filters"
-import { UpgradeModal } from "@/components/products/upgrade-modal"
+import { FreePlanAlert } from "@/components/shared/free-plan-alert"
 
 type HistoryTableProps = {
   activities: StockActivity[]
@@ -22,7 +20,6 @@ export function HistoryTable({ activities, isFreePlan, historyLimitDays }: Histo
   const [dateFilter, setDateFilter] = useState("all")
   const [typeFilter, setTypeFilter] = useState("all")
   const [productFilters, setProductFilters] = useState<string[]>([])
-  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false)
 
   // Get unique product names for the product filter
   const uniqueProducts = useMemo(() => {
@@ -84,24 +81,11 @@ export function HistoryTable({ activities, isFreePlan, historyLimitDays }: Histo
     <>
       {/* Free Plan Limit Alert */}
       {isFreePlan && (
-        <Alert className="mb-6">
-          <Sparkles className="h-4 w-4" />
-          <AlertTitle>Plan gratuit - Historique limité à {historyLimitDays} jours</AlertTitle>
-          <AlertDescription className="flex items-center justify-between gap-4">
-            <span>
-              Vous consultez l'historique des {historyLimitDays} derniers jours uniquement.
-              Passez à Premium pour accéder à l'historique complet sans limite.
-            </span>
-            <Button
-              size="sm"
-              onClick={() => setUpgradeModalOpen(true)}
-              className="flex-shrink-0"
-            >
-              <Sparkles className="h-4 w-4 mr-2" />
-              Passer à Premium
-            </Button>
-          </AlertDescription>
-        </Alert>
+        <FreePlanAlert
+          title="Plan gratuit"
+          description={`Vous consultez l'historique des ${historyLimitDays} derniers jours uniquement. Passez à Premium pour accéder à l'historique complet sans limite.`}
+          limitDisplay={`Historique limité à ${historyLimitDays} jours`}
+        />
       )}
 
       <HistoryFilters
@@ -160,11 +144,6 @@ export function HistoryTable({ activities, isFreePlan, historyLimitDays }: Histo
           </Table>
         </div>
       )}
-
-      <UpgradeModal
-        open={upgradeModalOpen}
-        onOpenChange={setUpgradeModalOpen}
-      />
     </>
   )
 }
