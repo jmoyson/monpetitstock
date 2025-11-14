@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { X } from 'lucide-react'
 import { createProduct, updateProduct, type Product } from '@/app/(dashboard)/stock/actions'
+import { IconColorPicker } from '@/components/shared/icon-color-picker'
 
 type ProductModalProps = {
   open: boolean
@@ -22,6 +23,8 @@ export function ProductModal({ open, onOpenChange, product, onUpgradeRequired }:
   const [threshold, setThreshold] = useState('0')
   const [categoryInput, setCategoryInput] = useState('')
   const [categories, setCategories] = useState<string[]>([])
+  const [icon, setIcon] = useState('Package')
+  const [iconColor, setIconColor] = useState('#8b5cf6')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
 
@@ -31,11 +34,15 @@ export function ProductModal({ open, onOpenChange, product, onUpgradeRequired }:
       setCurrentStock(product.current_stock.toString())
       setThreshold(product.alert_threshold.toString())
       setCategories(product.category ? product.category.split(',').filter(Boolean) : [])
+      setIcon(product.icon || 'Package')
+      setIconColor(product.icon_color || '#8b5cf6')
     } else {
       setName('')
       setCurrentStock('0')
       setThreshold('0')
       setCategories([])
+      setIcon('Package')
+      setIconColor('#8b5cf6')
     }
     setCategoryInput('')
     setError('')
@@ -70,6 +77,8 @@ export function ProductModal({ open, onOpenChange, product, onUpgradeRequired }:
     formData.append('current_stock', currentStock)
     formData.append('alert_threshold', threshold)
     formData.append('category', categories.join(','))
+    formData.append('icon', icon)
+    formData.append('icon_color', iconColor)
 
     try {
       const result = product
@@ -114,13 +123,22 @@ export function ProductModal({ open, onOpenChange, product, onUpgradeRequired }:
 
             <div className="grid gap-2">
               <Label htmlFor="name">Nom du produit</Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Ex: Café en grains"
-                required
-              />
+              <div className="flex gap-2">
+                <IconColorPicker
+                  icon={icon}
+                  color={iconColor}
+                  onIconChange={setIcon}
+                  onColorChange={setIconColor}
+                />
+                <Input
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Ex: Café en grains"
+                  required
+                  className="flex-1"
+                />
+              </div>
             </div>
 
             <div className="grid gap-2">

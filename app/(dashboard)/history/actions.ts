@@ -12,6 +12,8 @@ export type StockActivity = {
   created_at: string;
   products: {
     name: string;
+    icon: string;
+    icon_color: string;
   } | null;
 };
 
@@ -49,7 +51,9 @@ export async function getStockActivities(): Promise<{
       quantity,
       created_at,
       products!inner (
-        name
+        name,
+        icon,
+        icon_color
       )
     `
     )

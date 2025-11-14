@@ -10,7 +10,22 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { History, Search } from "lucide-react";
+import {
+  History,
+  Search,
+  Package, Box, PackageOpen, PackageCheck, PackagePlus, PackageMinus,
+  ShoppingCart, ShoppingBag, Store, Warehouse,
+  Wrench, Hammer, Drill,
+  Coffee, Wine, Beer, Pizza, Utensils,
+  Shirt, Watch, Glasses, Gem, Crown,
+  Cpu, HardDrive, Monitor, Smartphone, Headphones,
+  Book, Pencil, Scissors, Paperclip, Ruler,
+  Home, Building, Factory, Landmark,
+  Car, Bike, Truck, Plane,
+  Heart, Star, Sparkles, Flame, Zap,
+  Circle, Square, Triangle,
+  type LucideIcon,
+} from "lucide-react";
 import type { StockActivity } from "@/app/(dashboard)/history/actions";
 import { ActivityTypeBadge } from "@/components/shared/activity-type-badge";
 import { formatDate, formatQuantity } from "@/lib/utils/formatters";
@@ -18,6 +33,21 @@ import { FreePlanAlert } from "@/components/shared/free-plan-alert";
 import { ActivityCardMobile } from "./activity-card-mobile";
 import { ActivityStatsCards } from "./activity-stats-cards";
 import { HistoryFilterSortModal } from "./history-filter-sort-modal";
+
+// Map of icon names to components
+const ICON_MAP: Record<string, LucideIcon> = {
+  Package, Box, PackageOpen, PackageCheck, PackagePlus, PackageMinus,
+  ShoppingCart, ShoppingBag, Store, Warehouse,
+  Wrench, Hammer, Drill,
+  Coffee, Wine, Beer, Pizza, Utensils,
+  Shirt, Watch, Glasses, Gem, Crown,
+  Cpu, HardDrive, Monitor, Smartphone, Headphones,
+  Book, Pencil, Scissors, Paperclip, Ruler,
+  Home, Building, Factory, Landmark,
+  Car, Bike, Truck, Plane,
+  Heart, Star, Sparkles, Flame, Zap,
+  Circle, Square, Triangle,
+};
 
 type HistoryTableProps = {
   activities: StockActivity[];
@@ -203,22 +233,40 @@ export function HistoryTable({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredActivities.map((activity) => (
-                  <TableRow key={activity.id}>
-                    <TableCell className="text-muted-foreground">
-                      {formatDate(activity.created_at)}
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {activity.products?.name || "Produit supprimé"}
-                    </TableCell>
-                    <TableCell>
-                      <ActivityTypeBadge type={activity.activity_type} />
-                    </TableCell>
-                    <TableCell className="text-right font-semibold">
-                      {formatQuantity(activity.quantity)}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {filteredActivities.map((activity) => {
+                  const IconComponent = activity.products
+                    ? ICON_MAP[activity.products.icon] || Package
+                    : Package;
+                  const iconColor = activity.products?.icon_color || '#8b5cf6';
+
+                  return (
+                    <TableRow key={activity.id}>
+                      <TableCell className="text-muted-foreground">
+                        {formatDate(activity.created_at)}
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="p-1.5 rounded-lg shrink-0"
+                            style={{ backgroundColor: `${iconColor}20` }}
+                          >
+                            <IconComponent
+                              className="h-3.5 w-3.5"
+                              style={{ color: iconColor }}
+                            />
+                          </div>
+                          <span>{activity.products?.name || "Produit supprimé"}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <ActivityTypeBadge type={activity.activity_type} />
+                      </TableCell>
+                      <TableCell className="text-right font-semibold">
+                        {formatQuantity(activity.quantity)}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </div>

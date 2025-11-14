@@ -11,6 +11,18 @@ import {
   Package2,
   RefreshCw,
   Search,
+  Box, PackageOpen, PackageCheck, PackagePlus, PackageMinus,
+  ShoppingCart, ShoppingBag, Store, Warehouse,
+  Wrench, Hammer, Drill,
+  Coffee, Wine, Beer, Pizza, Utensils,
+  Shirt, Watch, Glasses, Gem, Crown,
+  Cpu, HardDrive, Monitor, Smartphone, Headphones,
+  Book, Scissors, Paperclip, Ruler,
+  Home, Building, Factory, Landmark,
+  Car, Bike, Truck, Plane,
+  Heart, Star, Sparkles, Flame, Zap,
+  Circle, Square, Triangle,
+  type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -441,10 +453,38 @@ export function StockManagementClient({
                   const isProcessing = processingId === product.id;
                   const isDeleting = deletingId === product.id;
 
+                  // Map of icon names to components
+                  const ICON_MAP: Record<string, LucideIcon> = {
+                    Package, Box, PackageOpen, PackageCheck, PackagePlus, PackageMinus,
+                    ShoppingCart, ShoppingBag, Store, Warehouse,
+                    Wrench, Hammer, Drill,
+                    Coffee, Wine, Beer, Pizza, Utensils,
+                    Shirt, Watch, Glasses, Gem, Crown,
+                    Cpu, HardDrive, Monitor, Smartphone, Headphones,
+                    Book, Pencil, Scissors, Paperclip, Ruler,
+                    Home, Building, Factory, Landmark,
+                    Car, Bike, Truck, Plane,
+                    Heart, Star, Sparkles, Flame, Zap,
+                    Circle, Square, Triangle,
+                  };
+
+                  const IconComponent = ICON_MAP[product.icon] || Package;
+
                   return (
                     <TableRow key={product.id} className="group">
                       <TableCell className="font-medium">
-                        {product.name}
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="p-1.5 rounded-lg shrink-0"
+                            style={{ backgroundColor: `${product.icon_color}20` }}
+                          >
+                            <IconComponent
+                              className="h-3.5 w-3.5"
+                              style={{ color: product.icon_color }}
+                            />
+                          </div>
+                          <span>{product.name}</span>
+                        </div>
                       </TableCell>
                       <TableCell>
                         <CategoryBadges

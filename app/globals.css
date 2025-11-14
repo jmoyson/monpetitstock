@@ -163,4 +163,9 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Prevent layout shift when modal opens by reserving scrollbar space */
+  html {
+    scrollbar-gutter: stable;
+  }
 }

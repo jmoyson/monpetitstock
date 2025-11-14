@@ -13,7 +13,18 @@ import {
   MoreHorizontal,
   Pencil,
   Trash2,
-  Package,
+  Package, Box, PackageOpen, PackageCheck, PackagePlus, PackageMinus,
+  ShoppingCart, ShoppingBag, Store, Warehouse,
+  Wrench, Hammer, Drill,
+  Coffee, Wine, Beer, Pizza, Utensils,
+  Shirt, Watch, Glasses, Gem, Crown,
+  Cpu, HardDrive, Monitor, Smartphone, Headphones,
+  Book, Scissors, Paperclip, Ruler,
+  Home, Building, Factory, Landmark,
+  Car, Bike, Truck, Plane,
+  Heart, Star, Sparkles, Flame, Zap,
+  Circle, Square, Triangle,
+  type LucideIcon,
 } from "lucide-react";
 import { StockStatusBadge } from "@/components/shared/stock-status-badge";
 import { parseCategories } from "@/lib/utils/formatters";
@@ -43,14 +54,38 @@ export function ProductCardMobile({
   const categories = parseCategories(product.category);
   const isOutOfStock = product.current_stock === 0;
 
+  // Map of icon names to components
+  const ICON_MAP: Record<string, LucideIcon> = {
+    Package, Box, PackageOpen, PackageCheck, PackagePlus, PackageMinus,
+    ShoppingCart, ShoppingBag, Store, Warehouse,
+    Wrench, Hammer, Drill,
+    Coffee, Wine, Beer, Pizza, Utensils,
+    Shirt, Watch, Glasses, Gem, Crown,
+    Cpu, HardDrive, Monitor, Smartphone, Headphones,
+    Book, Pencil, Scissors, Paperclip, Ruler,
+    Home, Building, Factory, Landmark,
+    Car, Bike, Truck, Plane,
+    Heart, Star, Sparkles, Flame, Zap,
+    Circle, Square, Triangle,
+  };
+
+  // Get the icon component
+  const IconComponent = ICON_MAP[product.icon] || Package;
+
   return (
     <div className="rounded-xl border bg-card overflow-hidden shadow-sm hover:shadow-md transition-shadow">
       <div className="p-3 space-y-2">
         {/* Header */}
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-start gap-2.5 flex-1 min-w-0">
-            <div className="mt-0.5 p-1.5 rounded-lg bg-primary/10 shrink-0">
-              <Package className="h-4 w-4 text-primary" />
+            <div
+              className="mt-0.5 p-1.5 rounded-lg shrink-0"
+              style={{ backgroundColor: `${product.icon_color}20` }}
+            >
+              <IconComponent
+                className="h-4 w-4"
+                style={{ color: product.icon_color }}
+              />
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-base truncate">{product.name}</h3>

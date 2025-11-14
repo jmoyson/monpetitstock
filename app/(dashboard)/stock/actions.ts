@@ -11,6 +11,8 @@ export type Product = {
   current_stock: number
   alert_threshold: number
   category: string | null
+  icon: string
+  icon_color: string
   created_at: string
   updated_at: string
 }
@@ -57,6 +59,8 @@ export async function createProduct(formData: FormData) {
   const current_stock = parseInt(formData.get('current_stock') as string) || 0
   const alert_threshold = parseInt(formData.get('alert_threshold') as string) || 0
   const category = formData.get('category') as string || null
+  const icon = formData.get('icon') as string || 'Package'
+  const icon_color = formData.get('icon_color') as string || '#8b5cf6'
 
   if (!name) {
     return { error: 'Name is required' }
@@ -69,7 +73,9 @@ export async function createProduct(formData: FormData) {
       name,
       alert_threshold,
       category,
-      current_stock
+      current_stock,
+      icon,
+      icon_color
     })
 
   if (error) {
@@ -93,6 +99,8 @@ export async function updateProduct(id: string, formData: FormData) {
   const current_stock = parseInt(formData.get('current_stock') as string) || 0
   const alert_threshold = parseInt(formData.get('alert_threshold') as string) || 0
   const category = formData.get('category') as string || null
+  const icon = formData.get('icon') as string || 'Package'
+  const icon_color = formData.get('icon_color') as string || '#8b5cf6'
 
   if (!name) {
     return { error: 'Name is required' }
@@ -104,7 +112,9 @@ export async function updateProduct(id: string, formData: FormData) {
       name,
       current_stock,
       alert_threshold,
-      category
+      category,
+      icon,
+      icon_color
     })
     .eq('id', id)
     .eq('user_id', user.id)
