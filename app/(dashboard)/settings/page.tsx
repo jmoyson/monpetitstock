@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { SubscriptionCard } from '@/components/subscription/subscription-card'
 import { ThemeSelector } from '@/components/settings/theme-selector'
+import { LogoutButton } from '@/components/auth/logout-button'
 import { getUserSubscription } from '@/lib/subscription'
 
 export default async function SettingsPage() {
@@ -33,6 +34,11 @@ export default async function SettingsPage() {
             subscription={subscription}
             userEmail={user.email || ''}
           />
+
+          <div className="pt-4 border-t">
+            <h2 className="text-lg font-semibold mb-4">Compte</h2>
+            <LogoutButton />
+          </div>
         </div>
       </main>
     </div>

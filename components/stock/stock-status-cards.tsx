@@ -26,7 +26,9 @@ export function StockStatusCards({
       count: counts.outOfStock,
       icon: AlertCircle,
       color: "text-status-alert-foreground",
-      activeColor: "border-status-alert-border bg-status-alert",
+      bgColor: "bg-status-alert/30",
+      borderColor: "border-status-alert-border/50",
+      activeBorderColor: "border-status-alert-border",
     },
     {
       status: STOCK_STATUS.LOW_STOCK,
@@ -34,7 +36,9 @@ export function StockStatusCards({
       count: counts.lowStock,
       icon: TrendingDown,
       color: "text-status-warning-foreground",
-      activeColor: "border-status-warning-border bg-status-warning",
+      bgColor: "bg-status-warning/30",
+      borderColor: "border-status-warning-border/50",
+      activeBorderColor: "border-status-warning-border",
     },
     {
       status: STOCK_STATUS.IN_STOCK,
@@ -42,13 +46,15 @@ export function StockStatusCards({
       count: counts.inStock,
       icon: CheckCircle2,
       color: "text-status-ok-foreground",
-      activeColor: "border-status-ok-border bg-status-ok",
+      bgColor: "bg-status-ok/30",
+      borderColor: "border-status-ok-border/50",
+      activeBorderColor: "border-status-ok-border",
     },
   ];
 
   return (
     <div className="grid grid-cols-3 gap-2 md:gap-3">
-      {cards.map(({ status, label, count, icon: Icon, color, activeColor }) => {
+      {cards.map(({ status, label, count, icon: Icon, color, bgColor, borderColor, activeBorderColor }) => {
         const isActive = activeFilter === status;
 
         return (
@@ -56,14 +62,15 @@ export function StockStatusCards({
             key={status}
             onClick={() => onFilterChange(isActive ? "all" : status)}
             className={cn(
-              "relative border rounded-lg p-3 md:p-4 text-center transition-all cursor-pointer bg-card group",
+              "relative rounded-lg p-3 md:p-4 text-center transition-all cursor-pointer group",
+              bgColor,
               "hover:shadow-md active:scale-95",
-              isActive ? activeColor : "hover:border-muted-foreground/30"
+              isActive ? `border-2 ${activeBorderColor}` : `border ${borderColor} hover:${activeBorderColor}/70`
             )}
           >
             {/* Active indicator with close icon */}
             {isActive && (
-              <div className="absolute top-2 right-2 opacity-60 group-hover:opacity-100 transition-opacity">
+              <div className={cn("absolute top-2 right-2 opacity-60 group-hover:opacity-100 transition-opacity", color)}>
                 <X className="h-3 w-3 md:h-4 md:w-4" />
               </div>
             )}
