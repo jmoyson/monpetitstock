@@ -8,10 +8,12 @@ export const metadata: Metadata = {
   metadataBase:
     process.env.NEXT_PUBLIC_APP_URL || new URL("https://www.monpetitstock.fr"),
   title: "Mon Petit Stock",
-  description: "Le moyen le plus simple de gérer votre stock",
+  description:
+    "La solution la plus simple pour suivre votre inventaire. Gratuit, sans CB, prêt en 30 secondes.",
   openGraph: {
     title: "Mon Petit Stock",
-    description: "Le moyen le plus simple de gérer votre stock",
+    description:
+      "La solution la plus simple pour suivre votre inventaire. Gratuit, sans CB, prêt en 30 secondes.",
     url: process.env.NEXT_PUBLIC_APP_URL || "https://www.monpetitstock.fr",
     siteName: "Mon Petit Stock",
     images: [
@@ -28,7 +30,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Mon Petit Stock",
-    description: "Le moyen le plus simple de gérer votre stock",
+    description:
+      "La solution la plus simple pour suivre votre inventaire. Gratuit, sans CB, prêt en 30 secondes.",
     images: ["/og-image.png"],
   },
 };

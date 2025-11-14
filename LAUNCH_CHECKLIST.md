@@ -157,11 +157,11 @@ V0.1 MVP launching on Product Hunt tomorrow at 1-2pm. This issue tracks all esse
   - [ ] Product creation/update buttons
   - [ ] Add `disabled={isLoading}` where needed
 
-- [ ] **Add error boundary** (30 min)
-  - [ ] Create `app/error.tsx`
-  - [ ] Catch unexpected crashes
-  - [ ] Show French error message
-  - [ ] Add retry button
+- [x] **Add error boundary** (30 min)
+  - [x] Create `app/error.tsx`
+  - [x] Catch unexpected crashes
+  - [x] Show French error message
+  - [x] Add retry button
   - See implementation in "Error Boundary Code" section below
 
 ---
