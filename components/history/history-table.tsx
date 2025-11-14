@@ -9,12 +9,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { History } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { History, Search } from "lucide-react";
 import type { StockActivity } from "@/app/(dashboard)/history/actions";
 import { ActivityTypeBadge } from "@/components/shared/activity-type-badge";
 import { formatDate, formatQuantity } from "@/lib/utils/formatters";
-import { HistoryFilters } from "./history-filters";
 import { FreePlanAlert } from "@/components/shared/free-plan-alert";
+import { ActivityCardMobile } from "./activity-card-mobile";
+import { ActivityStatsCards } from "./activity-stats-cards";
+import { HistoryFilterSortModal } from "./history-filter-sort-modal";
 
 type HistoryTableProps = {
   activities: StockActivity[];
@@ -31,21 +34,33 @@ export function HistoryTable({
   const [dateFilter, setDateFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [productFilters, setProductFilters] = useState<string[]>([]);
+  const [sortMode, setSortMode] = useState("date-desc");
 
-  // Get unique product names for the product filter
+  // Extract unique products from activities
   const uniqueProducts = useMemo(() => {
-    const products = new Set<string>();
-    activities.forEach((activity) => {
-      if (activity.products?.name) {
-        products.add(activity.products.name);
-      }
-    });
-    return Array.from(products).sort();
+    const products = activities
+      .map((activity) => activity.products?.name || "Produit supprimé")
+      .filter((name, index, self) => self.indexOf(name) === index)
+      .sort();
+    return products;
   }, [activities]);
 
-  // Filter activities based on all filters
+  // Calculate statistics
+  const stats = useMemo(() => {
+    return activities.reduce(
+      (acc, activity) => {
+        if (activity.activity_type === "in") acc.totalIn++;
+        if (activity.activity_type === "out") acc.totalOut++;
+        acc.totalActivities++;
+        return acc;
+      },
+      { totalIn: 0, totalOut: 0, totalActivities: 0 }
+    );
+  }, [activities]);
+
+  // Filter and sort activities
   const filteredActivities = useMemo(() => {
-    return activities.filter((activity) => {
+    let filtered = activities.filter((activity) => {
       // Search filter
       const productName = activity.products?.name || "Produit supprimé";
       const matchesSearch = productName
@@ -58,7 +73,7 @@ export function HistoryTable({
         return false;
       }
 
-      // Product filter (multi-select)
+      // Product filter
       if (productFilters.length > 0 && !productFilters.includes(productName)) {
         return false;
       }
@@ -88,10 +103,32 @@ export function HistoryTable({
 
       return true;
     });
-  }, [activities, searchQuery, dateFilter, typeFilter, productFilters]);
+
+    // Apply sorting
+    filtered.sort((a, b) => {
+      switch (sortMode) {
+        case "date-desc":
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        case "date-asc":
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        case "quantity-desc":
+          return b.quantity - a.quantity;
+        case "quantity-asc":
+          return a.quantity - b.quantity;
+        case "product-name":
+          const aName = a.products?.name || "Produit supprimé";
+          const bName = b.products?.name || "Produit supprimé";
+          return aName.localeCompare(bName);
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  }, [activities, searchQuery, dateFilter, typeFilter, productFilters, sortMode]);
 
   return (
-    <>
+    <div className="space-y-4">
       {/* Free Plan Limit Alert */}
       {isFreePlan && (
         <FreePlanAlert
@@ -102,18 +139,37 @@ export function HistoryTable({
         />
       )}
 
-      <HistoryFilters
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        dateFilter={dateFilter}
-        onDateFilterChange={setDateFilter}
-        typeFilter={typeFilter}
-        onTypeFilterChange={setTypeFilter}
-        productFilters={productFilters}
-        onProductFiltersChange={setProductFilters}
-        uniqueProducts={uniqueProducts}
+      {/* Search and Filter/Sort Toolbar */}
+      <div className="flex items-center gap-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Rechercher un produit..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9 h-10"
+          />
+        </div>
+        <HistoryFilterSortModal
+          dateFilter={dateFilter}
+          onDateFilterChange={setDateFilter}
+          productFilters={productFilters}
+          onProductFiltersChange={setProductFilters}
+          availableProducts={uniqueProducts}
+          sortMode={sortMode}
+          onSortModeChange={setSortMode}
+        />
+      </div>
+
+      {/* Activity Stats Cards */}
+      <ActivityStatsCards
+        stats={stats}
+        activeFilter={typeFilter}
+        onFilterChange={setTypeFilter}
       />
 
+      {/* Empty State or Content */}
       {filteredActivities.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <History className="h-12 w-12 text-muted-foreground mb-4" />
@@ -127,37 +183,47 @@ export function HistoryTable({
           </p>
         </div>
       ) : (
-        <div className="border rounded-lg overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Produit</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead className="text-right">Quantité</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredActivities.map((activity) => (
-                <TableRow key={activity.id}>
-                  <TableCell className="text-muted-foreground">
-                    {formatDate(activity.created_at)}
-                  </TableCell>
-                  <TableCell className="font-medium">
-                    {activity.products?.name || "Produit supprimé"}
-                  </TableCell>
-                  <TableCell>
-                    <ActivityTypeBadge type={activity.activity_type} />
-                  </TableCell>
-                  <TableCell className="text-right font-semibold">
-                    {formatQuantity(activity.quantity)}
-                  </TableCell>
+        <>
+          {/* Mobile View */}
+          <div className="md:hidden grid gap-3">
+            {filteredActivities.map((activity) => (
+              <ActivityCardMobile key={activity.id} activity={activity} />
+            ))}
+          </div>
+
+          {/* Desktop View */}
+          <div className="hidden md:block border rounded-lg overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Produit</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead className="text-right">Quantité</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+              </TableHeader>
+              <TableBody>
+                {filteredActivities.map((activity) => (
+                  <TableRow key={activity.id}>
+                    <TableCell className="text-muted-foreground">
+                      {formatDate(activity.created_at)}
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {activity.products?.name || "Produit supprimé"}
+                    </TableCell>
+                    <TableCell>
+                      <ActivityTypeBadge type={activity.activity_type} />
+                    </TableCell>
+                    <TableCell className="text-right font-semibold">
+                      {formatQuantity(activity.quantity)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </>
       )}
-    </>
+    </div>
   );
 }

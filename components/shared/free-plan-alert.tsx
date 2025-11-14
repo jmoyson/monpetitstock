@@ -42,25 +42,25 @@ export function FreePlanAlert({
 
   return (
     <>
-      <div className="mb-6 flex items-center gap-3 rounded-lg border border-orange-200 bg-orange-50/50 px-4 py-3 dark:border-orange-900/50 dark:bg-orange-950/20">
-        <Sparkles className="h-4 w-4 shrink-0 text-orange-600 dark:text-orange-400" />
+      <div className="mb-6 flex items-center gap-3 rounded-lg border border-status-warning-border bg-status-warning px-4 py-3">
+        <Sparkles className="h-4 w-4 shrink-0 text-status-warning-foreground" />
         <div className="flex-1 text-sm">
-          <span className="font-medium text-orange-900 dark:text-orange-300">
+          <span className="font-medium text-status-warning-foreground">
             {title}
             {limitDisplay && (
-              <span className="ml-2 text-orange-700/80 dark:text-orange-400/70">
+              <span className="ml-2 opacity-80">
                 · {limitDisplay}
               </span>
             )}
           </span>
-          <div className="mt-0.5 text-orange-700/80 dark:text-orange-400/70">
+          <div className="mt-0.5 opacity-80">
             {description}
           </div>
         </div>
         <Button
           size="sm"
           variant="outline"
-          className="h-8 shrink-0 border-orange-300 hover:bg-orange-100 dark:border-orange-800 dark:hover:bg-orange-900/30"
+          className="h-8 shrink-0 border-status-warning-foreground/30 hover:bg-status-warning-foreground/10"
           onClick={() => setUpgradeModalOpen(true)}
         >
           <Sparkles className="h-4 w-4 mr-2" />

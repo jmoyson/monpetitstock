@@ -95,7 +95,7 @@ export function StockManagementClient({
   const touchStartY = useRef(0);
   const isPulling = useRef(false);
 
-  const isAtLimit = initialProducts.length >= FREE_PLAN_LIMIT;
+  const isAtLimit = !isPro && initialProducts.length >= FREE_PLAN_LIMIT;
 
   // Add sortable fields to products
   const productsWithSortFields = useMemo<ProductWithSortFields[]>(() => {
@@ -289,7 +289,7 @@ export function StockManagementClient({
   const handleTouchEnd = async () => {
     if (isPulling.current && pullDistance > 60) {
       setIsPullingToRefresh(true);
-      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate refresh
+      await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate refresh
       router.refresh();
       setIsPullingToRefresh(false);
     }
@@ -304,27 +304,36 @@ export function StockManagementClient({
     const container = containerRef.current;
     if (!container) return;
 
-    container.addEventListener('touchstart', handleTouchStart, { passive: false });
-    container.addEventListener('touchmove', handleTouchMove, { passive: false });
-    container.addEventListener('touchend', handleTouchEnd);
+    container.addEventListener("touchstart", handleTouchStart, {
+      passive: false,
+    });
+    container.addEventListener("touchmove", handleTouchMove, {
+      passive: false,
+    });
+    container.addEventListener("touchend", handleTouchEnd);
 
     return () => {
-      container.removeEventListener('touchstart', handleTouchStart);
-      container.removeEventListener('touchmove', handleTouchMove);
-      container.removeEventListener('touchend', handleTouchEnd);
+      container.removeEventListener("touchstart", handleTouchStart);
+      container.removeEventListener("touchmove", handleTouchMove);
+      container.removeEventListener("touchend", handleTouchEnd);
     };
   }, [pullDistance]);
 
-
   return (
-    <main ref={containerRef} className="container mx-auto px-4 py-6 md:py-8 relative">
+    <main
+      ref={containerRef}
+      className="container mx-auto px-2 py-6 md:py-8 relative"
+    >
       {/* Pull-to-Refresh Indicator */}
       {pullDistance > 0 && (
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2 flex items-center justify-center transition-opacity"
           style={{
             opacity: Math.min(pullDistance / 60, 1),
-            transform: `translateX(-50%) translateY(${Math.min(pullDistance - 20, 40)}px)`
+            transform: `translateX(-50%) translateY(${Math.min(
+              pullDistance - 20,
+              40
+            )}px)`,
           }}
         >
           <RefreshCw
@@ -465,13 +474,19 @@ export function StockManagementClient({
                             size="sm"
                             variant="outline"
                             onClick={() => handleUseProduct(product)}
-                            disabled={isProcessing || product.current_stock <= 0}
+                            disabled={
+                              isProcessing || product.current_stock <= 0
+                            }
                           >
                             <Package2 className="h-4 w-4 mr-1.5" />
                             Ouvrir
                           </Button>
                           <Button
-                            variant={product.current_stock === 0 ? "destructive" : "default"}
+                            variant={
+                              product.current_stock === 0
+                                ? "destructive"
+                                : "default"
+                            }
                             size="sm"
                             onClick={() => handleRestock(product)}
                             disabled={isProcessing}

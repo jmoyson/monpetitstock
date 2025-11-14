@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { SubscriptionCard } from '@/components/subscription/subscription-card'
+import { ThemeSelector } from '@/components/settings/theme-selector'
 import { getUserSubscription } from '@/lib/subscription'
 
 export default async function SettingsPage() {
@@ -25,6 +26,8 @@ export default async function SettingsPage() {
               Gérez votre abonnement et vos préférences
             </p>
           </div>
+
+          <ThemeSelector />
 
           <SubscriptionCard
             subscription={subscription}

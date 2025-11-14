@@ -28,11 +28,11 @@ export function StockStatusBadge({
 
   const classNameMap = {
     [STOCK_STATUS.OUT_OF_STOCK]:
-      "bg-red-100 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-400 dark:border-red-800",
+      "bg-status-alert text-status-alert-foreground border-status-alert-border",
     [STOCK_STATUS.LOW_STOCK]:
-      "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-400 dark:border-orange-800",
+      "bg-status-warning text-status-warning-foreground border-status-warning-border",
     [STOCK_STATUS.IN_STOCK]:
-      "bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-400 dark:border-green-800",
+      "bg-status-ok text-status-ok-foreground border-status-ok-border",
   };
 
   // Icon components
@@ -47,8 +47,7 @@ export function StockStatusBadge({
       variant={variantMap[status]}
       className={cn(
         "font-medium gap-1",
-        classNameMap[status],
-        status === STOCK_STATUS.OUT_OF_STOCK && "animate-pulse"
+        classNameMap[status]
       )}
     >
       <IconComponent className="h-3 w-3" />
