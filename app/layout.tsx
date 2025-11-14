@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import Umami from "@/components/shared/Umami";
 
 export const metadata: Metadata = {
   title: "Mon Petit Stock",
@@ -25,6 +26,7 @@ export default function RootLayout({
           {children}
           <Toaster />
         </ThemeProvider>
+        <Umami />
       </body>
     </html>
   );
