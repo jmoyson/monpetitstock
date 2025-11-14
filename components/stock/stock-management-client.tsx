@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useTransition } from "react";
+import { useState, useMemo, useTransition, useRef, useEffect } from "react";
 import {
   Plus,
   Minus,
@@ -8,6 +8,8 @@ import {
   Pencil,
   Trash2,
   Package,
+  Package2,
+  RefreshCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,10 +37,12 @@ import { UpgradeModal } from "@/components/shared/upgrade-modal";
 import {
   deleteProduct,
   useProduct,
+  updateStockQuantity,
   type Product,
 } from "@/app/(dashboard)/stock/actions";
 import { getStockStatus, STOCK_STATUS } from "@/lib/constants/stock";
 import { parseCategories } from "@/lib/utils/formatters";
+import { cn } from "@/lib/utils";
 import { useSortableTable } from "@/hooks/use-table-sort";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -75,6 +79,15 @@ export function StockManagementClient({
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
+
+  // Pull-to-refresh states
+  const [isPullingToRefresh, setIsPullingToRefresh] = useState(false);
+  const [pullDistance, setPullDistance] = useState(0);
+
+  // Pull-to-refresh refs
+  const containerRef = useRef<HTMLDivElement>(null);
+  const touchStartY = useRef(0);
+  const isPulling = useRef(false);
 
   const isAtLimit = initialProducts.length >= FREE_PLAN_LIMIT;
 
@@ -211,8 +224,92 @@ export function StockManagementClient({
     }
   };
 
+  // Quick stock update handler
+  const handleQuickUpdate = async (productId: string, newStock: number) => {
+    setProcessingId(productId);
+    const result = await updateStockQuantity(productId, newStock);
+
+    if (result.error) {
+      toast.error(result.error);
+    } else {
+      toast.success("Stock mis à jour");
+      startTransition(() => router.refresh());
+    }
+
+    setProcessingId(null);
+  };
+
+  // Pull-to-refresh handlers
+  const handleTouchStart = (e: TouchEvent) => {
+    if (window.scrollY === 0) {
+      touchStartY.current = e.touches[0].clientY;
+      isPulling.current = false;
+    }
+  };
+
+  const handleTouchMove = (e: TouchEvent) => {
+    if (window.scrollY === 0 && touchStartY.current > 0) {
+      const touchY = e.touches[0].clientY;
+      const delta = touchY - touchStartY.current;
+
+      if (delta > 0 && delta <= 100) {
+        isPulling.current = true;
+        setPullDistance(delta);
+        e.preventDefault();
+      }
+    }
+  };
+
+  const handleTouchEnd = async () => {
+    if (isPulling.current && pullDistance > 60) {
+      setIsPullingToRefresh(true);
+      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate refresh
+      router.refresh();
+      setIsPullingToRefresh(false);
+    }
+
+    touchStartY.current = 0;
+    setPullDistance(0);
+    isPulling.current = false;
+  };
+
+  // Setup pull-to-refresh
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    container.addEventListener('touchstart', handleTouchStart, { passive: false });
+    container.addEventListener('touchmove', handleTouchMove, { passive: false });
+    container.addEventListener('touchend', handleTouchEnd);
+
+    return () => {
+      container.removeEventListener('touchstart', handleTouchStart);
+      container.removeEventListener('touchmove', handleTouchMove);
+      container.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [pullDistance]);
+
+
   return (
-    <main className="container mx-auto px-4 py-6 md:py-8">
+    <main ref={containerRef} className="container mx-auto px-4 py-6 md:py-8 relative">
+      {/* Pull-to-Refresh Indicator */}
+      {pullDistance > 0 && (
+        <div
+          className="absolute top-0 left-1/2 -translate-x-1/2 flex items-center justify-center transition-opacity"
+          style={{
+            opacity: Math.min(pullDistance / 60, 1),
+            transform: `translateX(-50%) translateY(${Math.min(pullDistance - 20, 40)}px)`
+          }}
+        >
+          <RefreshCw
+            className={cn(
+              "h-6 w-6 text-primary",
+              isPullingToRefresh && "animate-spin"
+            )}
+          />
+        </div>
+      )}
+
       {/* Free Plan Alert */}
       {isAtLimit && (
         <FreePlanAlert
@@ -274,6 +371,7 @@ export function StockManagementClient({
                 onRestock={handleRestock}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onQuickUpdate={handleQuickUpdate}
                 isProcessing={processingId === product.id}
                 isDeleting={deletingId === product.id}
               />
@@ -376,15 +474,15 @@ export function StockManagementClient({
                               isProcessing || product.current_stock <= 0
                             }
                           >
-                            <Minus className="h-4 w-4 mr-1" />
-                            Utiliser
+                            <Package2 className="h-4 w-4 mr-1.5" />
+                            Ouvrir
                           </Button>
                           <Button
                             size="sm"
                             onClick={() => handleRestock(product)}
                             disabled={isProcessing}
                           >
-                            <Plus className="h-4 w-4 mr-1" />
+                            <Plus className="h-4 w-4 mr-1.5" />
                             Ajouter
                           </Button>
                           <DropdownMenu>

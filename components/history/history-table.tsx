@@ -1,81 +1,94 @@
-"use client"
+"use client";
 
-import { useState, useMemo } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { History } from "lucide-react"
-import type { StockActivity } from "@/app/(dashboard)/history/actions"
-import { ActivityTypeBadge } from "@/components/shared/activity-type-badge"
-import { formatDate, formatQuantity } from "@/lib/utils/formatters"
-import { HistoryFilters } from "./history-filters"
-import { FreePlanAlert } from "@/components/shared/free-plan-alert"
+import { useState, useMemo } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { History } from "lucide-react";
+import type { StockActivity } from "@/app/(dashboard)/history/actions";
+import { ActivityTypeBadge } from "@/components/shared/activity-type-badge";
+import { formatDate, formatQuantity } from "@/lib/utils/formatters";
+import { HistoryFilters } from "./history-filters";
+import { FreePlanAlert } from "@/components/shared/free-plan-alert";
 
 type HistoryTableProps = {
-  activities: StockActivity[]
-  isFreePlan: boolean
-  historyLimitDays: number
-}
+  activities: StockActivity[];
+  isFreePlan: boolean;
+  historyLimitDays: number;
+};
 
-export function HistoryTable({ activities, isFreePlan, historyLimitDays }: HistoryTableProps) {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [dateFilter, setDateFilter] = useState("all")
-  const [typeFilter, setTypeFilter] = useState("all")
-  const [productFilters, setProductFilters] = useState<string[]>([])
+export function HistoryTable({
+  activities,
+  isFreePlan,
+  historyLimitDays,
+}: HistoryTableProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dateFilter, setDateFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [productFilters, setProductFilters] = useState<string[]>([]);
 
   // Get unique product names for the product filter
   const uniqueProducts = useMemo(() => {
-    const products = new Set<string>()
+    const products = new Set<string>();
     activities.forEach((activity) => {
       if (activity.products?.name) {
-        products.add(activity.products.name)
+        products.add(activity.products.name);
       }
-    })
-    return Array.from(products).sort()
-  }, [activities])
+    });
+    return Array.from(products).sort();
+  }, [activities]);
 
   // Filter activities based on all filters
   const filteredActivities = useMemo(() => {
     return activities.filter((activity) => {
       // Search filter
-      const productName = activity.products?.name || 'Produit supprimé'
-      const matchesSearch = productName.toLowerCase().includes(searchQuery.toLowerCase())
-      if (!matchesSearch) return false
+      const productName = activity.products?.name || "Produit supprimé";
+      const matchesSearch = productName
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      if (!matchesSearch) return false;
 
       // Type filter
       if (typeFilter !== "all" && activity.activity_type !== typeFilter) {
-        return false
+        return false;
       }
 
       // Product filter (multi-select)
       if (productFilters.length > 0 && !productFilters.includes(productName)) {
-        return false
+        return false;
       }
 
       // Date filter
       if (dateFilter !== "all") {
-        const activityDate = new Date(activity.created_at)
-        const now = new Date()
+        const activityDate = new Date(activity.created_at);
+        const now = new Date();
 
         switch (dateFilter) {
           case "today":
-            const isToday = activityDate.toDateString() === now.toDateString()
-            if (!isToday) return false
-            break
+            const isToday = activityDate.toDateString() === now.toDateString();
+            if (!isToday) return false;
+            break;
           case "week":
-            const weekAgo = new Date(now)
-            weekAgo.setDate(now.getDate() - 7)
-            if (activityDate < weekAgo) return false
-            break
+            const weekAgo = new Date(now);
+            weekAgo.setDate(now.getDate() - 7);
+            if (activityDate < weekAgo) return false;
+            break;
           case "month":
-            const monthAgo = new Date(now)
-            monthAgo.setMonth(now.getMonth() - 1)
-            if (activityDate < monthAgo) return false
-            break
+            const monthAgo = new Date(now);
+            monthAgo.setMonth(now.getMonth() - 1);
+            if (activityDate < monthAgo) return false;
+            break;
         }
       }
 
-      return true
-    })
-  }, [activities, searchQuery, dateFilter, typeFilter, productFilters])
+      return true;
+    });
+  }, [activities, searchQuery, dateFilter, typeFilter, productFilters]);
 
   return (
     <>
@@ -83,7 +96,7 @@ export function HistoryTable({ activities, isFreePlan, historyLimitDays }: Histo
       {isFreePlan && (
         <FreePlanAlert
           title="Plan gratuit"
-          description={`Vous consultez l'historique des ${historyLimitDays} derniers jours uniquement. Passez à Premium pour accéder à l'historique complet sans limite.`}
+          description={`Passez à Premium pour accéder à l'historique complet sans limite.`}
           limitDisplay={`Historique limité à ${historyLimitDays} jours`}
         />
       )}
@@ -130,7 +143,7 @@ export function HistoryTable({ activities, isFreePlan, historyLimitDays }: Histo
                     {formatDate(activity.created_at)}
                   </TableCell>
                   <TableCell className="font-medium">
-                    {activity.products?.name || 'Produit supprimé'}
+                    {activity.products?.name || "Produit supprimé"}
                   </TableCell>
                   <TableCell>
                     <ActivityTypeBadge type={activity.activity_type} />
@@ -145,5 +158,5 @@ export function HistoryTable({ activities, isFreePlan, historyLimitDays }: Histo
         </div>
       )}
     </>
-  )
+  );
 }

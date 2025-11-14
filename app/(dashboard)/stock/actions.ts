@@ -241,3 +241,63 @@ export async function restockProduct(productId: string, quantity: number, note?:
   revalidatePath('/stock')
   return { success: true }
 }
+
+export async function updateStockQuantity(productId: string, newQuantity: number) {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return { error: 'Not authenticated' }
+  }
+
+  if (newQuantity < 0) {
+    return { error: 'Quantity cannot be negative' }
+  }
+
+  // Get current stock to calculate delta
+  const { data: product, error: fetchError } = await supabase
+    .from('products')
+    .select('current_stock')
+    .eq('id', productId)
+    .eq('user_id', user.id)
+    .single()
+
+  if (fetchError || !product) {
+    console.error('Error fetching product:', fetchError)
+    return { error: 'Product not found' }
+  }
+
+  const delta = newQuantity - product.current_stock
+
+  // Update stock
+  const { error: updateError } = await supabase
+    .from('products')
+    .update({ current_stock: newQuantity })
+    .eq('id', productId)
+    .eq('user_id', user.id)
+
+  if (updateError) {
+    console.error('Error updating stock:', updateError)
+    return { error: 'Failed to update stock' }
+  }
+
+  // Create stock activity if there was a change
+  if (delta !== 0) {
+    const { error: activityError } = await supabase
+      .from('stock_activities')
+      .insert({
+        user_id: user.id,
+        product_id: productId,
+        activity_type: delta > 0 ? 'in' : 'out',
+        quantity: Math.abs(delta),
+        note: 'Ajustement rapide'
+      })
+
+    if (activityError) {
+      console.error('Error creating activity:', activityError)
+    }
+  }
+
+  revalidatePath('/stock')
+  return { success: true }
+}

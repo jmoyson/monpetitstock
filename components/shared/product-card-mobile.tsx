@@ -1,13 +1,25 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, Minus, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import {
+  Plus,
+  Minus,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  Check,
+  X,
+  Package2,
+  PackagePlus,
+} from "lucide-react";
 import { StockStatusBadge } from "@/components/shared/stock-status-badge";
 import { parseCategories } from "@/lib/utils/formatters";
 import { cn } from "@/lib/utils";
@@ -19,6 +31,7 @@ type ProductCardMobileProps = {
   onRestock: (product: Product) => void;
   onEdit: (product: Product) => void;
   onDelete: (id: string) => void;
+  onQuickUpdate?: (productId: string, newStock: number) => Promise<void>;
   isProcessing: boolean;
   isDeleting: boolean;
 };
@@ -29,20 +42,21 @@ export function ProductCardMobile({
   onRestock,
   onEdit,
   onDelete,
+  onQuickUpdate,
   isProcessing,
   isDeleting,
 }: ProductCardMobileProps) {
   const categories = parseCategories(product.category);
 
   return (
-    <div className={cn("rounded-lg border overflow-hidden")}>
+    <div className="rounded-lg border overflow-hidden">
       <div className="p-2.5 space-y-1.5">
-        {/* Header with name, badge, and menu */}
+        {/* Header */}
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-base truncate">{product.name}</h3>
+            <h3 className="font-semibold text-base truncate">{product.name}</h3>
             {categories.length > 0 && (
-              <p className="text-xs text-muted-foreground/70 mt-0.5">
+              <p className="text-xs text-muted-foreground/70 mt-0.5 truncate">
                 {categories.slice(0, 2).join(" · ")}
               </p>
             )}
@@ -80,34 +94,31 @@ export function ProductCardMobile({
           </div>
         </div>
 
-        {/* Centered stock display */}
-        <div className="text-center py-1">
-          <span className="text-3xl font-bold tracking-tight">
-            {product.current_stock}
-          </span>
-          <p className="text-xs text-muted-foreground mt-0.5">en stock</p>
+        {/* Stock display */}
+        <div className="text-center py-1.5 text-4xl  font-bold tracking-tight tabular-nums ">
+          {product.current_stock}
         </div>
 
-        {/* Action buttons */}
-        <div className="flex gap-1.5">
+        {/* Action buttons - slightly asymmetric */}
+        <div className="flex justify-between gap-1.5">
           <Button
             variant="outline"
             size="sm"
-            className="flex-1 h-8"
+            className="h-9 px-3"
             onClick={() => onUse(product)}
             disabled={isProcessing || product.current_stock <= 0}
           >
-            <Minus className="h-3.5 w-3.5 mr-1" />
-            Utiliser
+            <Package2 className="h-4 w-4 mr-1.5" />
+            <span>Ouvrir</span>
           </Button>
           <Button
             size="sm"
-            className="flex-1 h-8"
+            className="h-9"
             onClick={() => onRestock(product)}
             disabled={isProcessing}
           >
-            <Plus className="h-3.5 w-3.5 mr-1" />
-            Ajouter
+            <PackagePlus className="h-4 w-4 mr-1.5" />
+            <span>Ajouter</span>
           </Button>
         </div>
       </div>
