@@ -5,7 +5,6 @@ import {
   STOCK_STATUS_LABELS,
 } from "@/lib/constants/stock";
 import { cn } from "@/lib/utils";
-import { AlertCircle, TrendingDown, CheckCircle2 } from "lucide-react";
 
 type StockStatusBadgeProps = {
   currentStock: number;
@@ -19,38 +18,32 @@ export function StockStatusBadge({
   const status = getStockStatus(currentStock, alertThreshold);
   const label = STOCK_STATUS_LABELS[status];
 
-  // Consistent styling for all stock statuses
-  const variantMap = {
-    [STOCK_STATUS.OUT_OF_STOCK]: "destructive" as const,
-    [STOCK_STATUS.LOW_STOCK]: "outline" as const,
-    [STOCK_STATUS.IN_STOCK]: "secondary" as const,
-  };
-
+  // Exact same styling as landing page
   const classNameMap = {
     [STOCK_STATUS.OUT_OF_STOCK]:
-      "bg-status-alert text-status-alert-foreground border-status-alert-border",
+      "bg-red-100 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-400 dark:border-red-900",
     [STOCK_STATUS.LOW_STOCK]:
-      "bg-status-warning text-status-warning-foreground border-status-warning-border",
+      "bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-950 dark:text-yellow-400 dark:border-yellow-900",
     [STOCK_STATUS.IN_STOCK]:
-      "bg-status-ok text-status-ok-foreground border-status-ok-border",
+      "bg-green-100 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-400 dark:border-green-900",
   };
 
-  // Icon components
-  const IconComponent = {
-    [STOCK_STATUS.OUT_OF_STOCK]: AlertCircle,
-    [STOCK_STATUS.LOW_STOCK]: TrendingDown,
-    [STOCK_STATUS.IN_STOCK]: CheckCircle2,
-  }[status];
+  // Dot colors
+  const dotColorMap = {
+    [STOCK_STATUS.OUT_OF_STOCK]: "bg-red-500",
+    [STOCK_STATUS.LOW_STOCK]: "bg-yellow-500",
+    [STOCK_STATUS.IN_STOCK]: "bg-green-500",
+  };
 
   return (
     <Badge
-      variant={variantMap[status]}
+      variant="outline"
       className={cn(
-        "font-medium gap-1",
+        "text-xs gap-1.5",
         classNameMap[status]
       )}
     >
-      <IconComponent className="h-3 w-3" />
+      <span className={cn("w-1.5 h-1.5 rounded-full", dotColorMap[status])} />
       {label}
     </Badge>
   );

@@ -137,11 +137,11 @@ export function ProductCardMobile({
           <Button
             variant="outline"
             size="sm"
-            className="flex-1 h-9 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 transition-colors"
+            className="flex-1 h-9"
             onClick={() => onUse(product)}
             disabled={isProcessing || product.current_stock <= 0}
           >
-            <Minus className="h-4 w-4 mr-1.5" />
+            <PackageMinus className="h-4 w-4 mr-1.5" />
             Retirer
           </Button>
           <Button
@@ -151,7 +151,7 @@ export function ProductCardMobile({
             onClick={() => onRestock(product)}
             disabled={isProcessing}
           >
-            <Plus className="h-4 w-4 mr-1.5" />
+            <PackagePlus className="h-4 w-4 mr-1.5" />
             Ajouter
           </Button>
         </div>

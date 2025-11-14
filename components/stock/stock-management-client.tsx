@@ -440,12 +440,12 @@ export function StockManagementClient({
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/30">
-                  <TableHead>Produit</TableHead>
-                  <TableHead>Catégories</TableHead>
-                  <TableHead className="text-center">Stock</TableHead>
-                  <TableHead className="text-center">Seuil</TableHead>
-                  <TableHead className="text-center">Statut</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="h-14">Produit</TableHead>
+                  <TableHead className="h-14">Catégorie</TableHead>
+                  <TableHead className="text-center h-14">Stock</TableHead>
+                  <TableHead className="text-center h-14">Seuil</TableHead>
+                  <TableHead className="text-center h-14">Statut</TableHead>
+                  <TableHead className="text-right h-14">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -471,19 +471,19 @@ export function StockManagementClient({
                   const IconComponent = ICON_MAP[product.icon] || Package;
 
                   return (
-                    <TableRow key={product.id} className="group">
+                    <TableRow key={product.id} className="group h-20">
                       <TableCell className="font-medium">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-3">
                           <div
-                            className="p-1.5 rounded-lg shrink-0"
+                            className="p-2 rounded-lg shrink-0"
                             style={{ backgroundColor: `${product.icon_color}20` }}
                           >
                             <IconComponent
-                              className="h-3.5 w-3.5"
+                              className="h-5 w-5"
                               style={{ color: product.icon_color }}
                             />
                           </div>
-                          <span>{product.name}</span>
+                          <span className="text-base">{product.name}</span>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -493,11 +493,11 @@ export function StockManagementClient({
                         />
                       </TableCell>
                       <TableCell className="text-center">
-                        <span className="font-bold tabular-nums">
+                        <span className="font-bold tabular-nums text-lg">
                           {product.current_stock}
                         </span>
                       </TableCell>
-                      <TableCell className="text-center font-medium tabular-nums text-muted-foreground">
+                      <TableCell className="text-center font-medium tabular-nums text-muted-foreground text-base">
                         {product.alert_threshold}
                       </TableCell>
                       <TableCell>
@@ -517,9 +517,10 @@ export function StockManagementClient({
                             disabled={
                               isProcessing || product.current_stock <= 0
                             }
+                            className="h-9"
                           >
-                            <Package2 className="h-4 w-4 mr-1.5" />
-                            Ouvrir
+                            <PackageMinus className="h-4 w-4 mr-1.5" />
+                            Retirer
                           </Button>
                           <Button
                             variant={
@@ -530,8 +531,9 @@ export function StockManagementClient({
                             size="sm"
                             onClick={() => handleRestock(product)}
                             disabled={isProcessing}
+                            className="h-9"
                           >
-                            <Plus className="h-4 w-4 mr-1.5" />
+                            <PackagePlus className="h-4 w-4 mr-1.5" />
                             Ajouter
                           </Button>
                           <DropdownMenu>

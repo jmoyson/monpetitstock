@@ -7,8 +7,8 @@ export const STOCK_STATUS = {
 
 export const STOCK_STATUS_LABELS = {
   [STOCK_STATUS.OUT_OF_STOCK]: 'Rupture',
-  [STOCK_STATUS.LOW_STOCK]: 'Attention',
-  [STOCK_STATUS.IN_STOCK]: 'OK',
+  [STOCK_STATUS.LOW_STOCK]: 'Stock bas',
+  [STOCK_STATUS.IN_STOCK]: 'En stock',
 } as const
 
 // Activity types

@@ -9,34 +9,31 @@ import { cn } from '@/lib/utils'
 
 const showcaseProducts = [
   {
-    id: 1,
-    name: 'Café en grains',
-    icon: Coffee,
-    color: 'text-amber-600',
-    bgColor: 'bg-amber-100 dark:bg-amber-950',
-    current_stock: 12,
-    alert_threshold: 5,
-    category: 'Alimentation'
+    id: 3,
+    name: 'T-shirts blancs (L)',
+    icon: Shirt,
+    icon_color: '#9333ea',
+    current_stock: 0,
+    alert_threshold: 10,
+    category: 'Textile'
   },
   {
     id: 2,
     name: 'Ciseaux professionnels',
     icon: Scissors,
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-100 dark:bg-blue-950',
+    icon_color: '#2563eb',
     current_stock: 3,
     alert_threshold: 5,
     category: 'Outils'
   },
   {
-    id: 3,
-    name: 'T-shirts blancs (L)',
-    icon: Shirt,
-    color: 'text-purple-600',
-    bgColor: 'bg-purple-100 dark:bg-purple-950',
-    current_stock: 0,
-    alert_threshold: 10,
-    category: 'Textile'
+    id: 1,
+    name: 'Café en grains',
+    icon: Coffee,
+    icon_color: '#d97706',
+    current_stock: 12,
+    alert_threshold: 5,
+    category: 'Alimentation'
   },
 ]
 
@@ -114,12 +111,12 @@ export function RealisticProductShowcase() {
           <table className="w-full">
             <thead>
               <tr className="bg-zinc-50 dark:bg-zinc-800/50 border-b border-zinc-200 dark:border-zinc-700">
-                <th className="text-left py-3 px-4 text-sm font-semibold text-zinc-900 dark:text-zinc-100">Produit</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-zinc-900 dark:text-zinc-100">Catégorie</th>
-                <th className="text-center py-3 px-4 text-sm font-semibold text-zinc-900 dark:text-zinc-100">Stock</th>
-                <th className="text-center py-3 px-4 text-sm font-semibold text-zinc-900 dark:text-zinc-100">Seuil</th>
-                <th className="text-center py-3 px-4 text-sm font-semibold text-zinc-900 dark:text-zinc-100">Statut</th>
-                <th className="text-right py-3 px-4 text-sm font-semibold text-zinc-900 dark:text-zinc-100">Actions</th>
+                <th className="text-left py-4 px-4 text-sm font-semibold text-zinc-900 dark:text-zinc-100 h-14">Produit</th>
+                <th className="text-left py-4 px-4 text-sm font-semibold text-zinc-900 dark:text-zinc-100 h-14">Catégorie</th>
+                <th className="text-center py-4 px-4 text-sm font-semibold text-zinc-900 dark:text-zinc-100 h-14">Stock</th>
+                <th className="text-center py-4 px-4 text-sm font-semibold text-zinc-900 dark:text-zinc-100 h-14">Seuil</th>
+                <th className="text-center py-4 px-4 text-sm font-semibold text-zinc-900 dark:text-zinc-100 h-14">Statut</th>
+                <th className="text-right py-4 px-4 text-sm font-semibold text-zinc-900 dark:text-zinc-100 h-14">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
@@ -129,15 +126,21 @@ export function RealisticProductShowcase() {
                 return (
                   <tr
                     key={product.id}
-                    className="group hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors"
+                    className="group hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors h-20"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
                     <td className="py-4 px-4">
                       <div className="flex items-center gap-3">
-                        <div className={cn("p-2.5 rounded-lg", product.bgColor)}>
-                          <Icon className={cn("h-5 w-5", product.color)} />
+                        <div
+                          className="p-2 rounded-lg shrink-0"
+                          style={{ backgroundColor: `${product.icon_color}20` }}
+                        >
+                          <Icon
+                            className="h-5 w-5"
+                            style={{ color: product.icon_color }}
+                          />
                         </div>
-                        <span className="font-medium text-zinc-900 dark:text-zinc-100">{product.name}</span>
+                        <span className="font-medium text-base text-zinc-900 dark:text-zinc-100">{product.name}</span>
                       </div>
                     </td>
                     <td className="py-4 px-4">
@@ -146,10 +149,10 @@ export function RealisticProductShowcase() {
                       </Badge>
                     </td>
                     <td className="py-4 px-4 text-center">
-                      <span className="font-semibold text-zinc-900 dark:text-zinc-100">{product.current_stock}</span>
+                      <span className="font-bold tabular-nums text-lg text-zinc-900 dark:text-zinc-100">{product.current_stock}</span>
                     </td>
                     <td className="py-4 px-4 text-center">
-                      <span className="text-zinc-600 dark:text-zinc-400">{product.alert_threshold}</span>
+                      <span className="font-medium tabular-nums text-base text-zinc-600 dark:text-zinc-400">{product.alert_threshold}</span>
                     </td>
                     <td className="py-4 px-4">
                       <div className="flex justify-center">
@@ -160,23 +163,25 @@ export function RealisticProductShowcase() {
                       </div>
                     </td>
                     <td className="py-4 px-4">
-                      <div className="flex items-center justify-end gap-1">
+                      <div className="flex items-center justify-end gap-2">
                         <Button
                           size="sm"
                           variant="outline"
-                          className="h-8 w-8 p-0"
+                          className="h-9"
                           onClick={() => handleDecrement(product.id)}
                           disabled={product.current_stock === 0}
                         >
-                          <PackageMinus className="h-4 w-4" />
+                          <PackageMinus className="h-4 w-4 mr-1.5" />
+                          Retirer
                         </Button>
                         <Button
                           size="sm"
-                          variant="outline"
-                          className="h-8 w-8 p-0"
+                          variant={product.current_stock === 0 ? "destructive" : "default"}
+                          className="h-9"
                           onClick={() => handleIncrement(product.id)}
                         >
-                          <PackagePlus className="h-4 w-4" />
+                          <PackagePlus className="h-4 w-4 mr-1.5" />
+                          Ajouter
                         </Button>
                       </div>
                     </td>
@@ -234,58 +239,67 @@ export function RealisticProductShowcase() {
               return (
                 <div
                   key={product.id}
-                  className="bg-zinc-50 dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-4"
+                  className="rounded-xl border bg-white dark:bg-zinc-900 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
                 >
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div className={cn("p-2.5 rounded-lg", product.bgColor)}>
-                    <Icon className={cn("h-5 w-5", product.color)} />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">{product.name}</h3>
-                    <Badge variant="outline" className="text-xs mt-1">
-                      {product.category}
-                    </Badge>
-                  </div>
-                </div>
-                <Badge variant="outline" className={cn("text-xs gap-1.5", status.color)}>
-                  <span className={cn("w-1.5 h-1.5 rounded-full", status.dotColor)}></span>
-                  {status.label}
-                </Badge>
-              </div>
+                  <div className="p-3 space-y-2">
+                    {/* Header */}
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-start gap-2.5 flex-1 min-w-0">
+                        <div
+                          className="mt-0.5 p-1.5 rounded-lg shrink-0"
+                          style={{ backgroundColor: `${product.icon_color}20` }}
+                        >
+                          <Icon
+                            className="h-4 w-4"
+                            style={{ color: product.icon_color }}
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-base truncate text-zinc-900 dark:text-zinc-100">{product.name}</h3>
+                          <Badge variant="outline" className="text-xs mt-1">
+                            {product.category}
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="shrink-0">
+                        <Badge variant="outline" className={cn("text-xs gap-1.5", status.color)}>
+                          <span className={cn("w-1.5 h-1.5 rounded-full", status.dotColor)}></span>
+                          {status.label}
+                        </Badge>
+                      </div>
+                    </div>
 
-              <div className="grid grid-cols-2 gap-3 mb-3 text-sm">
-                <div>
-                  <span className="text-zinc-600 dark:text-zinc-400">Stock actuel</span>
-                  <p className="font-semibold text-lg text-zinc-900 dark:text-zinc-100">{product.current_stock}</p>
-                </div>
-                <div>
-                  <span className="text-zinc-600 dark:text-zinc-400">Seuil d'alerte</span>
-                  <p className="font-semibold text-lg text-zinc-900 dark:text-zinc-100">{product.alert_threshold}</p>
-                </div>
-              </div>
+                    {/* Stock Display */}
+                    <div className="text-center py-2 bg-muted/30 rounded-lg">
+                      <span className="text-4xl font-bold tracking-tight tabular-nums text-zinc-900 dark:text-zinc-100">
+                        {product.current_stock}
+                      </span>
+                      <p className="text-xs text-muted-foreground mt-1">en stock</p>
+                    </div>
 
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="flex-1 gap-2"
-                  onClick={() => handleDecrement(product.id)}
-                  disabled={product.current_stock === 0}
-                >
-                  <PackageMinus className="h-4 w-4" />
-                  Utiliser
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="flex-1 gap-2"
-                  onClick={() => handleIncrement(product.id)}
-                >
-                  <PackagePlus className="h-4 w-4" />
-                  +5
-                </Button>
-              </div>
+                    {/* Actions */}
+                    <div className="flex gap-2 pt-1">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1 h-9"
+                        onClick={() => handleDecrement(product.id)}
+                        disabled={product.current_stock === 0}
+                      >
+                        <PackageMinus className="h-4 w-4 mr-1.5" />
+                        Retirer
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={product.current_stock === 0 ? "destructive" : "default"}
+                        className="flex-1 h-9"
+                        onClick={() => handleIncrement(product.id)}
+                      >
+                        <PackagePlus className="h-4 w-4 mr-1.5" />
+                        Ajouter
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               )
             })}
