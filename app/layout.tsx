@@ -5,8 +5,32 @@ import { ThemeProvider } from "@/components/theme-provider";
 import Umami from "@/components/shared/umami";
 
 export const metadata: Metadata = {
+  metadataBase:
+    process.env.NEXT_PUBLIC_APP_URL || new URL("https://www.monpetitstock.fr"),
   title: "Mon Petit Stock",
   description: "Le moyen le plus simple de gérer votre stock",
+  openGraph: {
+    title: "Mon Petit Stock",
+    description: "Le moyen le plus simple de gérer votre stock",
+    url: process.env.NEXT_PUBLIC_APP_URL || "https://www.monpetitstock.fr",
+    siteName: "Mon Petit Stock",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Mon Petit Stock - Gérez votre stock en 2 clics",
+      },
+    ],
+    locale: "fr_FR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Mon Petit Stock",
+    description: "Le moyen le plus simple de gérer votre stock",
+    images: ["/og-image.png"],
+  },
 };
 
 export default function RootLayout({
