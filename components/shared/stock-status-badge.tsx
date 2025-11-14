@@ -5,6 +5,7 @@ import {
   STOCK_STATUS_LABELS,
 } from "@/lib/constants/stock";
 import { cn } from "@/lib/utils";
+import { AlertCircle, TrendingDown, CheckCircle2 } from "lucide-react";
 
 type StockStatusBadgeProps = {
   currentStock: number;
@@ -34,26 +35,24 @@ export function StockStatusBadge({
       "bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-400 dark:border-green-800",
   };
 
-  // Dot indicator for minimalist design
-  const dotClassMap = {
-    [STOCK_STATUS.OUT_OF_STOCK]: "bg-red-600 dark:bg-red-500",
-    [STOCK_STATUS.LOW_STOCK]: "bg-orange-600 dark:bg-orange-500",
-    [STOCK_STATUS.IN_STOCK]: "bg-green-600 dark:bg-green-500",
-  };
+  // Icon components
+  const IconComponent = {
+    [STOCK_STATUS.OUT_OF_STOCK]: AlertCircle,
+    [STOCK_STATUS.LOW_STOCK]: TrendingDown,
+    [STOCK_STATUS.IN_STOCK]: CheckCircle2,
+  }[status];
 
   return (
     <Badge
       variant={variantMap[status]}
       className={cn(
-        "font-medium",
+        "font-medium gap-1",
         classNameMap[status],
         status === STOCK_STATUS.OUT_OF_STOCK && "animate-pulse"
       )}
     >
-      <span className="flex items-center gap-1.5">
-        <span className={cn("h-1.5 w-1.5 rounded-full", dotClassMap[status])} />
-        {label}
-      </span>
+      <IconComponent className="h-3 w-3" />
+      {label}
     </Badge>
   );
 }

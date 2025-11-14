@@ -1,8 +1,6 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,14 +13,10 @@ import {
   MoreHorizontal,
   Pencil,
   Trash2,
-  Check,
-  X,
-  Package2,
-  PackagePlus,
+  Package,
 } from "lucide-react";
 import { StockStatusBadge } from "@/components/shared/stock-status-badge";
 import { parseCategories } from "@/lib/utils/formatters";
-import { cn } from "@/lib/utils";
 import type { Product } from "@/app/(dashboard)/stock/actions";
 
 type ProductCardMobileProps = {
@@ -47,19 +41,25 @@ export function ProductCardMobile({
   isDeleting,
 }: ProductCardMobileProps) {
   const categories = parseCategories(product.category);
+  const isOutOfStock = product.current_stock === 0;
 
   return (
-    <div className="rounded-lg border overflow-hidden">
-      <div className="p-2.5 space-y-1.5">
+    <div className="rounded-xl border bg-card overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+      <div className="p-3 space-y-2">
         {/* Header */}
         <div className="flex items-start justify-between gap-2">
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-base truncate">{product.name}</h3>
-            {categories.length > 0 && (
-              <p className="text-xs text-muted-foreground/70 mt-0.5 truncate">
-                {categories.slice(0, 2).join(" · ")}
-              </p>
-            )}
+          <div className="flex items-start gap-2.5 flex-1 min-w-0">
+            <div className="mt-0.5 p-1.5 rounded-lg bg-primary/10 shrink-0">
+              <Package className="h-4 w-4 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-base truncate">{product.name}</h3>
+              {categories.length > 0 && (
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {categories.slice(0, 2).join(" · ")}
+                </p>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-1.5 shrink-0">
             <StockStatusBadge
@@ -68,23 +68,18 @@ export function ProductCardMobile({
             />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 w-6 p-0"
-                  disabled={isDeleting}
-                >
-                  <MoreHorizontal className="h-3.5 w-3.5" />
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-muted">
+                  <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onEdit(product)}>
+              <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuItem className="cursor-pointer" onClick={() => onEdit(product)}>
                   <Pencil className="h-3.5 w-3.5 mr-2" />
                   Modifier
                 </DropdownMenuItem>
                 <DropdownMenuItem
+                  className="text-destructive cursor-pointer"
                   onClick={() => onDelete(product.id)}
-                  className="text-destructive"
                 >
                   <Trash2 className="h-3.5 w-3.5 mr-2" />
                   Supprimer
@@ -94,31 +89,35 @@ export function ProductCardMobile({
           </div>
         </div>
 
-        {/* Stock display */}
-        <div className="text-center py-1.5 text-4xl  font-bold tracking-tight tabular-nums ">
-          {product.current_stock}
+        {/* Stock Display */}
+        <div className="text-center py-2 bg-muted/30 rounded-lg">
+          <span className="text-4xl font-bold tracking-tight tabular-nums">
+            {product.current_stock}
+          </span>
+          <p className="text-xs text-muted-foreground mt-1">en stock</p>
         </div>
 
-        {/* Action buttons - slightly asymmetric */}
-        <div className="flex justify-between gap-1.5">
+        {/* Actions */}
+        <div className="flex gap-2 pt-1">
           <Button
             variant="outline"
             size="sm"
-            className="h-9 px-3"
+            className="flex-1 h-9 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 transition-colors"
             onClick={() => onUse(product)}
             disabled={isProcessing || product.current_stock <= 0}
           >
-            <Package2 className="h-4 w-4 mr-1.5" />
-            <span>Ouvrir</span>
+            <Minus className="h-4 w-4 mr-1.5" />
+            Retirer
           </Button>
           <Button
+            variant={isOutOfStock ? "destructive" : "default"}
             size="sm"
-            className="h-9"
+            className="flex-1 h-9"
             onClick={() => onRestock(product)}
             disabled={isProcessing}
           >
-            <PackagePlus className="h-4 w-4 mr-1.5" />
-            <span>Ajouter</span>
+            <Plus className="h-4 w-4 mr-1.5" />
+            Ajouter
           </Button>
         </div>
       </div>

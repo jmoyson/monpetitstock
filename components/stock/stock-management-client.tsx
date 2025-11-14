@@ -10,12 +10,15 @@ import {
   Package,
   Package2,
   RefreshCw,
+  Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
   TableCell,
+  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
@@ -27,13 +30,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { StockStatusBadge } from "@/components/shared/stock-status-badge";
 import { CategoryBadges } from "@/components/shared/category-badges";
-import { ProductFilters } from "@/components/shared/product-filters";
-import { SortableTableHead } from "@/components/shared/sortable-table-head";
 import { ProductCardMobile } from "@/components/shared/product-card-mobile";
 import { FreePlanAlert } from "@/components/shared/free-plan-alert";
 import { ProductModal } from "./product-modal";
 import { RestockModal } from "./restock-modal";
 import { UpgradeModal } from "@/components/shared/upgrade-modal";
+import { StockStatusCards } from "./stock-status-cards";
+import { FilterSortSheet } from "./filter-sort-sheet";
 import {
   deleteProduct,
   useProduct,
@@ -43,7 +46,6 @@ import {
 import { getStockStatus, STOCK_STATUS } from "@/lib/constants/stock";
 import { parseCategories } from "@/lib/utils/formatters";
 import { cn } from "@/lib/utils";
-import { useSortableTable } from "@/hooks/use-table-sort";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -80,7 +82,9 @@ export function StockManagementClient({
   // Filter states
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
+
+  // Sort state - single combined value
+  const [sortMode, setSortMode] = useState("status");
 
   // Pull-to-refresh states
   const [isPullingToRefresh, setIsPullingToRefresh] = useState(false);
@@ -140,28 +144,48 @@ export function StockManagementClient({
         if (productStatus !== statusFilter) return false;
       }
 
-      if (categoryFilters.length > 0) {
-        const productCategories = parseCategories(product.category);
-        const hasMatchingCategory = categoryFilters.some((filter) =>
-          productCategories.includes(filter)
-        );
-        if (!hasMatchingCategory) return false;
-      }
-
       return true;
     });
-  }, [productsWithSortFields, searchQuery, statusFilter, categoryFilters]);
+  }, [productsWithSortFields, searchQuery, statusFilter]);
 
-  // Apply sorting - default by status
-  const {
-    items: sortedProducts,
-    requestSort,
-    getSortDirection,
-    getSortPriority,
-  } = useSortableTable<ProductWithSortFields>({
-    items: filteredProducts,
-    defaultSort: [{ key: "status_sort", direction: "asc" }],
-  });
+  // Calculate status counts for all products (not filtered)
+  const statusCounts = useMemo(() => {
+    return productsWithSortFields.reduce(
+      (acc, product) => {
+        const status = getStockStatus(
+          product.current_stock,
+          product.alert_threshold
+        );
+        if (status === STOCK_STATUS.OUT_OF_STOCK) acc.outOfStock++;
+        else if (status === STOCK_STATUS.LOW_STOCK) acc.lowStock++;
+        else acc.inStock++;
+        return acc;
+      },
+      { outOfStock: 0, lowStock: 0, inStock: 0 }
+    );
+  }, [productsWithSortFields]);
+
+  // Apply sorting
+  const sortedProducts = useMemo(() => {
+    const sorted = [...filteredProducts];
+
+    sorted.sort((a, b) => {
+      switch (sortMode) {
+        case "status":
+          return a.status_sort - b.status_sort;
+        case "stock-asc":
+          return a.current_stock - b.current_stock;
+        case "stock-desc":
+          return b.current_stock - a.current_stock;
+        case "name":
+          return a.name.localeCompare(b.name);
+        default:
+          return a.status_sort - b.status_sort;
+      }
+    });
+
+    return sorted;
+  }, [filteredProducts, sortMode]);
 
   // Handlers
   const handleCreate = () => {
@@ -322,23 +346,32 @@ export function StockManagementClient({
         />
       )}
 
-      {/* Integrated Toolbar */}
-      <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-        <div className="flex-1 max-w-2xl">
-          <ProductFilters
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            statusFilter={statusFilter}
-            onStatusFilterChange={setStatusFilter}
-            categoryFilters={categoryFilters}
-            onCategoryFiltersChange={setCategoryFilters}
-            uniqueCategories={uniqueCategories}
-          />
+      {/* Search Bar and Filters */}
+      <div className="mb-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Rechercher un produit..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 h-10"
+            />
+          </div>
+          <FilterSortSheet value={sortMode} onValueChange={setSortMode} />
+          <Button onClick={handleCreate} className="h-10 px-3">
+            <Plus className="h-4 w-4 md:mr-2" />
+            <span className="hidden md:inline">Nouveau</span>
+          </Button>
         </div>
-        <Button onClick={handleCreate} className="md:mt-0">
-          <Plus className="h-4 w-4 mr-2" />
-          Nouveau produit
-        </Button>
+
+        {/* Smart Status Filter Cards */}
+        <StockStatusCards
+          counts={statusCounts}
+          activeFilter={statusFilter}
+          onFilterChange={setStatusFilter}
+        />
       </div>
 
       {/* Empty State */}
@@ -386,53 +419,12 @@ export function StockManagementClient({
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/30">
-                  <SortableTableHead
-                    sortDirection={getSortDirection("name")}
-                    sortPriority={getSortPriority("name")}
-                    onSort={(multiSort) => requestSort("name", multiSort)}
-                  >
-                    Produit
-                  </SortableTableHead>
-                  <SortableTableHead
-                    sortDirection={getSortDirection("category_sort")}
-                    sortPriority={getSortPriority("category_sort")}
-                    onSort={(multiSort) =>
-                      requestSort("category_sort", multiSort)
-                    }
-                  >
-                    Catégories
-                  </SortableTableHead>
-                  <SortableTableHead
-                    align="center"
-                    sortDirection={getSortDirection("current_stock")}
-                    sortPriority={getSortPriority("current_stock")}
-                    onSort={(multiSort) =>
-                      requestSort("current_stock", multiSort)
-                    }
-                  >
-                    Stock
-                  </SortableTableHead>
-                  <SortableTableHead
-                    align="center"
-                    sortDirection={getSortDirection("alert_threshold")}
-                    sortPriority={getSortPriority("alert_threshold")}
-                    onSort={(multiSort) =>
-                      requestSort("alert_threshold", multiSort)
-                    }
-                  >
-                    Seuil
-                  </SortableTableHead>
-                  <SortableTableHead
-                    align="center"
-                    sortDirection={getSortDirection("status_sort")}
-                    sortPriority={getSortPriority("status_sort")}
-                    onSort={(multiSort) =>
-                      requestSort("status_sort", multiSort)
-                    }
-                  >
-                    Statut
-                  </SortableTableHead>
-                  <SortableTableHead align="right">Actions</SortableTableHead>
+                  <TableHead>Produit</TableHead>
+                  <TableHead>Catégories</TableHead>
+                  <TableHead className="text-center">Stock</TableHead>
+                  <TableHead className="text-center">Seuil</TableHead>
+                  <TableHead className="text-center">Statut</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -473,14 +465,13 @@ export function StockManagementClient({
                             size="sm"
                             variant="outline"
                             onClick={() => handleUseProduct(product)}
-                            disabled={
-                              isProcessing || product.current_stock <= 0
-                            }
+                            disabled={isProcessing || product.current_stock <= 0}
                           >
                             <Package2 className="h-4 w-4 mr-1.5" />
                             Ouvrir
                           </Button>
                           <Button
+                            variant={product.current_stock === 0 ? "destructive" : "default"}
                             size="sm"
                             onClick={() => handleRestock(product)}
                             disabled={isProcessing}
