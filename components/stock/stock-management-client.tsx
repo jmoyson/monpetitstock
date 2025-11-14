@@ -577,6 +577,7 @@ export function StockManagementClient({
         open={productModalOpen}
         onOpenChange={handleProductModalClose}
         product={selectedProduct}
+        allProducts={initialProducts}
         onUpgradeRequired={() => setUpgradeModalOpen(true)}
       />
 

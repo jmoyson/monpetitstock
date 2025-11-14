@@ -1,32 +1,46 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import { X } from 'lucide-react'
 import { createProduct, updateProduct, type Product } from '@/app/(dashboard)/stock/actions'
 import { IconColorPicker } from '@/components/shared/icon-color-picker'
+import { CategoryAutocomplete } from '@/components/shared/category-autocomplete'
 
 type ProductModalProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   product?: Product
+  allProducts?: Product[]
   onUpgradeRequired?: () => void
 }
 
-export function ProductModal({ open, onOpenChange, product, onUpgradeRequired }: ProductModalProps) {
+export function ProductModal({ open, onOpenChange, product, allProducts = [], onUpgradeRequired }: ProductModalProps) {
   const [name, setName] = useState('')
   const [currentStock, setCurrentStock] = useState('0')
   const [threshold, setThreshold] = useState('0')
-  const [categoryInput, setCategoryInput] = useState('')
   const [categories, setCategories] = useState<string[]>([])
   const [icon, setIcon] = useState('Package')
   const [iconColor, setIconColor] = useState('#8b5cf6')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
+
+  // Extract unique categories from all products
+  const availableCategories = useMemo(() => {
+    const allCategories = allProducts
+      .filter((p) => p.category)
+      .flatMap((p) => p.category!.split(',').filter(Boolean))
+      .map((cat) => cat.trim())
+
+    // Remove duplicates (case-insensitive)
+    const uniqueCategories = Array.from(
+      new Map(allCategories.map((cat) => [cat.toLowerCase(), cat])).values()
+    )
+
+    return uniqueCategories.sort()
+  }, [allProducts])
 
   useEffect(() => {
     if (product) {
@@ -44,28 +58,8 @@ export function ProductModal({ open, onOpenChange, product, onUpgradeRequired }:
       setIcon('Package')
       setIconColor('#8b5cf6')
     }
-    setCategoryInput('')
     setError('')
   }, [product, open])
-
-  const handleAddCategory = () => {
-    const trimmed = categoryInput.trim()
-    if (trimmed && !categories.includes(trimmed)) {
-      setCategories([...categories, trimmed])
-      setCategoryInput('')
-    }
-  }
-
-  const handleRemoveCategory = (category: string) => {
-    setCategories(categories.filter(c => c !== category))
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      handleAddCategory()
-    }
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -170,43 +164,11 @@ export function ProductModal({ open, onOpenChange, product, onUpgradeRequired }:
 
             <div className="grid gap-2">
               <Label htmlFor="category">Catégorie</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="category"
-                  value={categoryInput}
-                  onChange={(e) => setCategoryInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Tapez et appuyez sur Entrée"
-                />
-                <Button
-                  type="button"
-                  onClick={handleAddCategory}
-                  variant="outline"
-                  size="sm"
-                >
-                  Ajouter
-                </Button>
-              </div>
-              {categories.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {categories.map((cat) => (
-                    <Badge
-                      key={cat}
-                      variant="secondary"
-                      className="pl-2 pr-1 py-1 text-sm"
-                    >
-                      {cat}
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveCategory(cat)}
-                        className="ml-1 hover:bg-muted rounded-full p-0.5"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </Badge>
-                  ))}
-                </div>
-              )}
+              <CategoryAutocomplete
+                selectedCategories={categories}
+                onCategoriesChange={setCategories}
+                availableCategories={availableCategories}
+              />
             </div>
           </div>
 
