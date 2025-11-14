@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Package, Box, History } from "lucide-react";
+import { Package, Box, History, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
@@ -11,6 +11,7 @@ export function Navbar() {
   const navLinks = [
     { href: "/stock", label: "Stock", icon: Box },
     { href: "/history", label: "Historique", icon: History },
+    { href: "/settings", label: "Paramètres", icon: Settings },
   ];
 
   return (

@@ -13,9 +13,10 @@ type ProductModalProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   product?: Product
+  onUpgradeRequired?: () => void
 }
 
-export function ProductModal({ open, onOpenChange, product }: ProductModalProps) {
+export function ProductModal({ open, onOpenChange, product, onUpgradeRequired }: ProductModalProps) {
   const [name, setName] = useState('')
   const [currentStock, setCurrentStock] = useState('0')
   const [threshold, setThreshold] = useState('0')
@@ -76,7 +77,13 @@ export function ProductModal({ open, onOpenChange, product }: ProductModalProps)
         : await createProduct(formData)
 
       if (result.error) {
-        setError(result.error)
+        // Check if user hit the product limit
+        if (result.error === 'LIMIT_REACHED') {
+          onOpenChange(false)
+          onUpgradeRequired?.()
+        } else {
+          setError((result as any).message || result.error)
+        }
       } else {
         onOpenChange(false)
       }

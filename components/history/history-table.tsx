@@ -98,6 +98,7 @@ export function HistoryTable({
           title="Plan gratuit"
           description={`Passez à Premium pour accéder à l'historique complet sans limite.`}
           limitDisplay={`Historique limité à ${historyLimitDays} jours`}
+          isPro={!isFreePlan}
         />
       )}
 

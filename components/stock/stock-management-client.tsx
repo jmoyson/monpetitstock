@@ -49,6 +49,7 @@ import { toast } from "sonner";
 
 type StockManagementClientProps = {
   initialProducts: Product[];
+  isPro?: boolean;
 };
 
 type ProductWithSortFields = Product & {
@@ -60,6 +61,7 @@ const FREE_PLAN_LIMIT = 10;
 
 export function StockManagementClient({
   initialProducts,
+  isPro = false,
 }: StockManagementClientProps) {
   const router = useRouter();
   const [, startTransition] = useTransition();
@@ -316,6 +318,7 @@ export function StockManagementClient({
           title="Plan gratuit"
           description="Passez à Premium pour un nombre illimité de produits"
           limitDisplay={`${FREE_PLAN_LIMIT}/${FREE_PLAN_LIMIT} produits`}
+          isPro={isPro}
         />
       )}
 
@@ -528,6 +531,7 @@ export function StockManagementClient({
         open={productModalOpen}
         onOpenChange={handleProductModalClose}
         product={selectedProduct}
+        onUpgradeRequired={() => setUpgradeModalOpen(true)}
       />
 
       <RestockModal

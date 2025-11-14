@@ -43,11 +43,10 @@ export async function updateSession(request: NextRequest) {
 
   const user = data?.claims;
 
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith("/login") &&
-    !request.nextUrl.pathname.startsWith("/auth")
-  ) {
+  // Public routes that don't require authentication
+  // Note: /login, /auth/*, /api/stripe/webhook, and /stock-ui-tests
+  // are excluded at matcher level in proxy.ts (more efficient)
+  if (!user && request.nextUrl.pathname !== "/") {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();
     url.pathname = "/login";

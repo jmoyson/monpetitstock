@@ -20,14 +20,25 @@ type FreePlanAlertProps = {
    * Optional limit value to display (e.g., "10 products", "30 days")
    */
   limitDisplay?: string;
+
+  /**
+   * Whether the user has a Pro plan (hides the alert if true)
+   */
+  isPro?: boolean;
 };
 
 export function FreePlanAlert({
   title,
   description,
   limitDisplay,
+  isPro = false,
 }: FreePlanAlertProps) {
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+
+  // Don't show the alert if user has Pro plan
+  if (isPro) {
+    return null;
+  }
 
   return (
     <>

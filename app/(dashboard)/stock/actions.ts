@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { checkProductLimit } from '@/lib/subscription'
 
 export type Product = {
   id: string
@@ -41,6 +42,15 @@ export async function createProduct(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return { error: 'Not authenticated' }
+  }
+
+  // Check product limit for free users
+  const { canCreate, count } = await checkProductLimit(user.id)
+  if (!canCreate) {
+    return {
+      error: 'LIMIT_REACHED',
+      message: `Vous avez atteint la limite de 10 produits du plan gratuit. Passez au plan Pro pour des produits illimités !`
+    }
   }
 
   const name = formData.get('name') as string

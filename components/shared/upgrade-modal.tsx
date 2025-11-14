@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +10,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 type UpgradeModalProps = {
   open: boolean;
@@ -17,9 +19,26 @@ type UpgradeModalProps = {
 };
 
 export function UpgradeModal({ open, onOpenChange }: UpgradeModalProps) {
-  const handleUpgrade = () => {
-    alert("La fonctionnalité de mise à niveau sera bientôt disponible !");
-    onOpenChange(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleUpgrade = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/stripe/checkout", {
+        method: "POST",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create checkout session");
+      }
+
+      const { url } = await response.json();
+      window.location.href = url;
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("Erreur lors de la création de la session de paiement");
+      setLoading(false);
+    }
   };
 
   return (
@@ -78,12 +97,25 @@ export function UpgradeModal({ open, onOpenChange }: UpgradeModalProps) {
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={loading}
+          >
             Plus tard
           </Button>
-          <Button onClick={handleUpgrade}>
-            <Sparkles className="h-4 w-4 mr-2" />
-            Passer à Premium
+          <Button onClick={handleUpgrade} disabled={loading}>
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Chargement...
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-4 w-4 mr-2" />
+                Passer à Premium
+              </>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
