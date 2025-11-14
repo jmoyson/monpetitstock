@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
-import Umami from "@/components/shared/Umami";
+import Umami from "@/components/shared/umami";
 
 export const metadata: Metadata = {
   title: "Mon Petit Stock",
